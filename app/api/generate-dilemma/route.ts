@@ -100,9 +100,6 @@ export async function POST(request: NextRequest) {
             imageUrl: imageUrl,
             sceneData: sceneDataJson, // 생성된 3D 장면 저장
             isActive: true,
-            totalResponses: 0,
-            countA: 0,
-            countB: 0,
           },
         })
 
@@ -187,9 +184,6 @@ export async function GET(request: NextRequest) {
         category: dilemma.category,
         sceneData: sceneDataJson, // 3D 장면도 함께 저장
         isActive: true,
-        totalResponses: 0,
-        countA: 0,
-        countB: 0,
       },
     })
 
