@@ -18,21 +18,21 @@ export const MODEL_CATALOG: ModelInfo[] = [
   // Farm Buildings
   {
     name: 'Big Barn',
-    path: '/models/farm/Big Barn/BigBarn.obj',
+    path: '/models/farm/Big%20Barn/BigBarn.obj',
     category: 'farm',
     tags: ['barn', 'agriculture', 'rural', 'building', 'farm'],
     defaultScale: 1.0
   },
   {
     name: 'Small Barn',
-    path: '/models/farm/Small Barn/SmallBarn.obj',
+    path: '/models/farm/Small%20Barn/SmallBarn.obj',
     category: 'farm',
     tags: ['barn', 'agriculture', 'rural', 'building', 'farm'],
     defaultScale: 0.8
   },
   {
     name: 'Open Barn',
-    path: '/models/farm/Open Barn/OpenBarn.obj',
+    path: '/models/farm/Open%20Barn/OpenBarn.obj',
     category: 'farm',
     tags: ['barn', 'agriculture', 'rural', 'building', 'farm'],
     defaultScale: 0.9
@@ -60,14 +60,14 @@ export const MODEL_CATALOG: ModelInfo[] = [
   },
   {
     name: 'Silo House',
-    path: '/models/farm/Silo House/Silo_House.obj',
+    path: '/models/farm/Silo%20House/Silo_House.obj',
     category: 'farm',
     tags: ['silo', 'storage', 'agriculture', 'rural', 'farm', 'building'],
     defaultScale: 0.8
   },
   {
     name: 'Tower Windmill',
-    path: '/models/farm/Tower Windmill/TowerWindmill.obj',
+    path: '/models/farm/Tower%20Windmill/TowerWindmill.obj',
     category: 'farm',
     tags: ['windmill', 'tower', 'energy', 'rural', 'farm'],
     defaultScale: 0.7

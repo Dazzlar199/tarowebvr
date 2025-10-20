@@ -16,7 +16,7 @@ async function createFarmDilemma() {
         // 큰 헛간 (왼쪽 멀리)
         {
           type: 'building',
-          modelPath: '/models/farm/Big Barn/BigBarn.obj',
+          modelPath: '/models/farm/Big%20Barn/BigBarn.obj',
           position: [-15, 0, -12],
           scale: [1, 1, 1],
           rotation: [0, Math.PI / 3, 0],
@@ -25,7 +25,7 @@ async function createFarmDilemma() {
         // 작은 헛간 (오른쪽 멀리)
         {
           type: 'building',
-          modelPath: '/models/farm/Small Barn/SmallBarn.obj',
+          modelPath: '/models/farm/Small%20Barn/SmallBarn.obj',
           position: [15, 0, -11],
           scale: [0.8, 0.8, 0.8],
           rotation: [0, -Math.PI / 4, 0],
@@ -52,7 +52,7 @@ async function createFarmDilemma() {
         // 풍차 (오른쪽 멀리)
         {
           type: 'building',
-          modelPath: '/models/farm/Tower Windmill/TowerWindmill.obj',
+          modelPath: '/models/farm/Tower%20Windmill/TowerWindmill.obj',
           position: [18, 0, -14],
           scale: [0.7, 0.7, 0.7],
           rotation: [0, 0, 0],
