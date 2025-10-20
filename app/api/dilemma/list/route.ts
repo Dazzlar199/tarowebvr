@@ -6,7 +6,7 @@ export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    const searchParams = request.nextUrl.searchParams
     const visibility = searchParams.get('visibility') || 'PUBLIC'
     const category = searchParams.get('category')
     const sort = searchParams.get('sort') || 'recent'
