@@ -1,0 +1,60 @@
+{
+  "name": "tarotaros-worlds",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WebXR world generation platform - Create explorable virtual worlds from text prompts",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@langchain/core": "^1.0.1",
+    "@langchain/openai": "^1.0.0",
+    "@libsql/client": "^0.14.0",
+    "@prisma/adapter-libsql": "^6.17.1",
+    "@prisma/client": "^5.20.0",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.16.8",
+    "@react-three/postprocessing": "^2.19.1",
+    "@react-three/xr": "^6.2.5",
+    "bcryptjs": "^2.4.3",
+    "cookie": "^1.0.2",
+    "framer-motion": "^12.23.22",
+    "jsonwebtoken": "^9.0.2",
+    "langchain": "^1.0.1",
+    "next": "14.2.16",
+    "openai": "^4.67.3",
+    "qrcode.react": "^4.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "three": "^0.164.1",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie": "^0.6.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/three": "^0.180.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.16",
+    "postcss": "^8.4.47",
+    "prisma": "^5.20.0",
+    "tailwindcss": "^3.4.14",
+    "tsx": "^4.20.6",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,354 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model - can be shared with main Tarotaros platform
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  username  String?  @unique
+  password  String?  // Optional - for future auth
+  role      String   @default("USER") // USER or ADMIN
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  dilemmas         Dilemma[]  @relation("UserDilemmas")
+  choices          Choice[]
+  dilemmaVisits    DilemmaVisit[]
+  analyses         Analysis[]
+  stories          Story[]    @relation("UserStories")
+  storyProgresses  UserStoryProgress[]
+  rooms            Room[]     @relation("RoomCreator")
+  roomParticipants RoomParticipant[]
+
+  @@index([email])
+  @@index([username])
+}
+
+// Dilemma situations presented to users
+model Dilemma {
+  id          String   @id @default(cuid())
+  title       String
+  description String   // The dilemma situation
+
+  // Two choice options
+  optionA     String   // Path A description
+  optionB     String   // Path B description
+
+  // AI-generated context
+  situation   String?  // Detailed scenario
+  facts       String?  // JSON array of facts
+
+  // Consequences (JSON strings)
+  immediateConsequences String? // {choiceA: string, choiceB: string}
+  longTermConsequences  String? // {choiceA: string, choiceB: string}
+  ethicalPrinciples     String? // {choiceA: string, choiceB: string}
+  hiddenMeaning         String? // Deeper philosophical meaning
+
+  // Visual content
+  imageUrl     String?  // Background image
+  thumbnailUrl String?  // Thumbnail for gallery
+  sceneData    String?  // JSON string of 3D scene (two portals)
+
+  // Metadata
+  category    String   @default("general") // ai_ethics, medical, resource_allocation, etc.
+  tags        String?  // Comma-separated tags
+  complexity  Int      @default(5)  // 1-10
+  emotionalIntensity Int @default(5) // 1-10
+
+  visibility  String   @default("PUBLIC") // PUBLIC, UNLISTED, PRIVATE
+  isActive    Boolean  @default(true)
+  isApproved  Boolean  @default(false)
+
+  // Statistics
+  viewCount   Int      @default(0)
+  choiceCount Int      @default(0)
+
+  // Author
+  authorId    String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  author      User?    @relation("UserDilemmas", fields: [authorId], references: [id], onDelete: SetNull)
+  choices     Choice[]
+  assets      DilemmaAsset[]
+  visits      DilemmaVisit[]
+  storyNodes  StoryNode[]
+
+  @@index([authorId])
+  @@index([visibility])
+  @@index([category])
+  @@index([createdAt])
+  @@index([choiceCount])
+}
+
+// User choices on dilemmas
+model Choice {
+  id         String   @id @default(cuid())
+  dilemmaId  String
+  userId     String
+
+  choice     String   // "A" or "B"
+
+  // VR interaction data
+  timeSpent  Int?     // Seconds spent before choosing
+  vrSession  Boolean  @default(false) // Was this choice made in VR?
+
+  createdAt  DateTime @default(now())
+
+  // Relations
+  dilemma    Dilemma  @relation(fields: [dilemmaId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([dilemmaId, userId]) // One choice per user per dilemma
+  @@index([userId])
+  @@index([dilemmaId])
+  @@index([createdAt])
+}
+
+// Personality analysis results
+model Analysis {
+  id          String   @id @default(cuid())
+  userId      String
+
+  // Analysis results (JSON strings)
+  type        String   // Moral foundations profile name
+  description String   // Detailed personality description
+  bigFive     String   // JSON: {openness, conscientiousness, extraversion, agreeableness, neuroticism}
+  valueAxes   String   // JSON: {individualismCollectivism, idealismRealism, emotionLogic, conservativeProgressive}
+
+  decisionPattern    String?  // Pattern description
+  defenseMechanisms  String?  // JSON array
+  growthAreas        String?  // JSON array
+  traits             String?  // JSON array
+
+  choiceCount Int      // Number of choices analyzed
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Assets associated with dilemmas (images, audio, etc.)
+model DilemmaAsset {
+  id        String     @id @default(cuid())
+  dilemmaId String
+
+  type      String     // IMAGE_360, IMAGE_REGULAR, AUDIO_BGM, AUDIO_SFX, MODEL_3D
+  url       String
+  metadata  String?    // JSON string for size, dimensions, etc.
+
+  createdAt DateTime   @default(now())
+
+  // Relations
+  dilemma   Dilemma    @relation(fields: [dilemmaId], references: [id], onDelete: Cascade)
+
+  @@index([dilemmaId])
+  @@index([type])
+}
+
+// Track dilemma visits
+model DilemmaVisit {
+  id        String   @id @default(cuid())
+  dilemmaId String
+  userId    String?
+
+  duration  Int?     // Duration in seconds
+  vrMode    Boolean  @default(false) // Was VR mode used?
+  createdAt DateTime @default(now())
+
+  // Relations
+  dilemma   Dilemma  @relation(fields: [dilemmaId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([dilemmaId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ============ NARRATIVE SYSTEM ============
+
+// Story - A connected narrative with multiple dilemmas
+model Story {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+
+  // Story metadata
+  theme       String?  // Main theme of the story
+  genre       String?  // sci-fi, fantasy, contemporary, etc.
+  difficulty  Int      @default(5) // 1-10
+
+  // Story structure
+  startNodeId String?  // Which StoryNode is the entry point
+
+  // Author
+  authorId    String?
+
+  // Status
+  isPublished Boolean  @default(false)
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  author      User?    @relation("UserStories", fields: [authorId], references: [id], onDelete: SetNull)
+  nodes       StoryNode[]
+  userProgresses UserStoryProgress[]
+
+  @@index([authorId])
+  @@index([isPublished])
+  @@index([createdAt])
+}
+
+// StoryNode - Each decision point in a story
+model StoryNode {
+  id          String   @id @default(cuid())
+  storyId     String
+  dilemmaId   String   // The dilemma presented at this node
+
+  // Node metadata
+  nodeOrder   Int      // Order in the story (for display)
+  isStart     Boolean  @default(false)
+  isEnd       Boolean  @default(false)
+
+  // Narrative context
+  contextBefore String? // Story text before the dilemma
+  contextAfter  String? // Story text after choice is made
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  story       Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  dilemma     Dilemma  @relation(fields: [dilemmaId], references: [id], onDelete: Cascade)
+
+  pathsFrom   StoryPath[] @relation("PathFrom")
+  pathsTo     StoryPath[] @relation("PathTo")
+
+  @@index([storyId])
+  @@index([dilemmaId])
+  @@index([nodeOrder])
+}
+
+// StoryPath - Connections between nodes based on choices
+model StoryPath {
+  id          String   @id @default(cuid())
+
+  fromNodeId  String
+  toNodeId    String
+  choice      String   // "A" or "B" - which choice leads to this path
+
+  // Path narrative
+  transitionText String? // Text shown during transition
+
+  // Path conditions (for advanced branching)
+  requiredChoices String? // JSON: [{nodeId, choice}] - previous choices required
+
+  createdAt   DateTime @default(now())
+
+  // Relations
+  fromNode    StoryNode @relation("PathFrom", fields: [fromNodeId], references: [id], onDelete: Cascade)
+  toNode      StoryNode @relation("PathTo", fields: [toNodeId], references: [id], onDelete: Cascade)
+
+  @@index([fromNodeId])
+  @@index([toNodeId])
+  @@index([choice])
+}
+
+// UserStoryProgress - Track user's journey through a story
+model UserStoryProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  storyId     String
+
+  currentNodeId String?  // Where the user currently is
+
+  // Progress tracking
+  choicesMade String   // JSON array of {nodeId, choice, timestamp}
+  isCompleted Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story       Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId]) // One progress per user per story
+  @@index([userId])
+  @@index([storyId])
+}
+
+// ============ MULTIPLAYER SYSTEM ============
+
+// Room - Multiplayer session
+model Room {
+  id          String   @id @default(cuid())
+  code        String   @unique // Joinable room code
+
+  name        String
+  description String?
+
+  creatorId   String
+
+  // Room settings
+  maxPlayers  Int      @default(8)
+  isPrivate   Boolean  @default(false)
+  requiresPassword Boolean @default(false)
+  password    String?
+
+  // Current state
+  currentDilemmaId String?
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator     User     @relation("RoomCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  participants RoomParticipant[]
+
+  @@index([code])
+  @@index([creatorId])
+  @@index([isActive])
+}
+
+// RoomParticipant - Users in a room
+model RoomParticipant {
+  id          String   @id @default(cuid())
+  roomId      String
+  userId      String
+
+  role        String   @default("PARTICIPANT") // PARTICIPANT or MODERATOR
+
+  // VR state
+  position    String?  // JSON: {x, y, z}
+  rotation    String?  // JSON: {x, y, z}
+  isInVR      Boolean  @default(false)
+
+  joinedAt    DateTime @default(now())
+  lastActive  DateTime @default(now())
+
+  // Relations
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId]) // One entry per user per room
+  @@index([roomId])
+  @@index([userId])
+}
