@@ -42,7 +42,7 @@ export default function HomePage() {
 
     // DEFAULT mode - Navigate directly to farm dilemma
     if (mode === 'DEFAULT') {
-      router.push('/explore/cmgyr4qrq00001ll1zhkwf8xv');
+      router.push('/explore/cmgz8ahqy0000vg38v5jl0frt');
       return;
     }
 
