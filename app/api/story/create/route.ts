@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { generateStoryArc, getDefaultStory, validateStoryArc } from '@/lib/ai/story-generator'
 import { successResponse, errorResponse, badRequestResponse } from '@/lib/api-response'
+import { generateDilemmaImage } from '@/lib/gemini'
 
 // Force Node.js runtime for Prisma compatibility
 export const runtime = 'nodejs'
@@ -85,6 +86,23 @@ export async function POST(request: NextRequest) {
     const nodeMap = new Map<number, string>() // nodeOrder -> storyNodeId
 
     for (const node of storyArc.nodes) {
+      // Generate Nano Banana image for this dilemma
+      let imageUrl: string | null = null
+      try {
+        console.log(`  🍌 Generating Nano Banana image for node ${node.nodeOrder}...`)
+        imageUrl = await generateDilemmaImage({
+          title: node.dilemmaTitle,
+          description: node.dilemmaDescription,
+          optionA: node.optionA,
+          optionB: node.optionB,
+          category: storyArc.genre || 'story',
+        })
+        console.log(`  ✅ Image generated for node ${node.nodeOrder}`)
+      } catch (imageError) {
+        console.error(`  ⚠️ Failed to generate image for node ${node.nodeOrder}:`, imageError)
+        // Continue without image
+      }
+
       // Create the dilemma for this node
       const dilemma = await prisma.dilemma.create({
         data: {
@@ -93,6 +111,7 @@ export async function POST(request: NextRequest) {
           optionA: node.optionA,
           optionB: node.optionB,
           situation: node.situation,
+          imageUrl: imageUrl, // Add Nano Banana image
           category: storyArc.genre,
           authorId,
           isActive: true,
@@ -214,6 +233,13 @@ export async function GET(request: NextRequest) {
             nodeOrder: true,
             isStart: true,
             isEnd: true,
+            dilemma: {
+              select: {
+                id: true,
+                title: true,
+                imageUrl: true,
+              }
+            }
           },
           orderBy: { nodeOrder: 'asc' },
         },

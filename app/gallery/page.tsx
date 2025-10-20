@@ -5,40 +5,40 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 
-interface World {
+interface Dilemma {
   id: string
   title: string
   description: string
-  thumbnailUrl: string | null
+  imageUrl: string | null
   viewCount: number
-  likeCount: number
+  choiceCount: number
   author: {
-    username: string
-  }
-  tags: string[]
+    username: string | null
+  } | null
+  category: string
 }
 
 export default function GalleryPage() {
   const router = useRouter()
-  const [worlds, setWorlds] = useState<World[]>([])
+  const [dilemmas, setDilemmas] = useState<Dilemma[]>([])
   const [loading, setLoading] = useState(true)
   const [sort, setSort] = useState('recent')
 
   useEffect(() => {
-    fetchWorlds()
+    fetchDilemmas()
   }, [sort])
 
-  async function fetchWorlds() {
+  async function fetchDilemmas() {
     try {
       setLoading(true)
-      const response = await fetch(`/api/world/gallery?sort=${sort}`)
+      const response = await fetch(`/api/dilemma/list?visibility=PUBLIC&sort=${sort}`)
       const data = await response.json()
 
       if (data.success) {
-        setWorlds(data.data.worlds)
+        setDilemmas(data.data.dilemmas || [])
       }
     } catch (error) {
-      console.error('Failed to fetch worlds:', error)
+      console.error('Failed to fetch dilemmas:', error)
     } finally {
       setLoading(false)
     }

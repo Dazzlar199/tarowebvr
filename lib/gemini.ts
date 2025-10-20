@@ -59,13 +59,20 @@ export async function generateDilemmaImage(
     // 이미지 데이터 추출
     const candidates = response.candidates
     if (!candidates || candidates.length === 0) {
-      console.error('No candidates in response')
+      console.warn('⚠️ No candidates in response (possibly content filtered by Gemini)')
       return null
     }
 
     const candidate = candidates[0]
+
+    // Check if content was blocked by safety filters
+    if (candidate.finishReason === 'SAFETY') {
+      console.warn('⚠️ Content blocked by Gemini safety filters')
+      return null
+    }
+
     if (!candidate.content || !candidate.content.parts) {
-      console.error('No content or parts in candidate')
+      console.warn('⚠️ No content or parts in candidate (possibly content filtered)')
       return null
     }
 

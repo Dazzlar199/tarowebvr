@@ -11,7 +11,17 @@ interface Story {
   theme?: string;
   genre?: string;
   difficulty: number;
-  nodes: any[];
+  nodes: Array<{
+    id: string;
+    nodeOrder: number;
+    isStart: boolean;
+    isEnd: boolean;
+    dilemma: {
+      id: string;
+      title: string;
+      imageUrl?: string;
+    };
+  }>;
   createdAt: string;
   author: {
     id: string;
@@ -204,69 +214,89 @@ export default function StoriesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stories.map((story, index) => (
-              <motion.div
-                key={story.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="panel p-6 border border-green-400/20 hover:border-green-400/50 transition-all cursor-pointer group"
-                onClick={() => handlePlayStory(story.id)}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-green-400 mb-2 group-hover:text-green-300 transition-colors">
-                      {story.title}
-                    </h3>
-                    {story.genre && (
-                      <span className="text-xs px-2 py-1 bg-green-400/10 border border-green-400/30 text-green-400 tracking-wider">
-                        {story.genre.toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: 10 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className={`w-1 h-3 ${
-                          i < story.difficulty
-                            ? 'bg-green-400'
-                            : 'bg-green-400/20'
-                        }`}
+            {stories.map((story, index) => {
+              // Get first node's image (or any node with an image)
+              const firstImageNode = story.nodes.find(n => n.dilemma.imageUrl)
+              const imageUrl = firstImageNode?.dilemma.imageUrl
+
+              return (
+                <motion.div
+                  key={story.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="panel border border-green-400/20 hover:border-green-400/50 transition-all cursor-pointer group overflow-hidden"
+                  onClick={() => handlePlayStory(story.id)}
+                >
+                  {/* Nano Banana Image - Tarot Card Style */}
+                  {imageUrl && (
+                    <div className="relative h-64 overflow-hidden">
+                      <img
+                        src={imageUrl}
+                        alt={story.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
-                    ))}
-                  </div>
-                </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                      {story.genre && (
+                        <span className="absolute top-4 left-4 text-xs px-3 py-1 bg-green-400/20 backdrop-blur-sm border border-green-400/50 text-green-400 tracking-wider font-bold">
+                          {story.genre.toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
-                <p className="text-gray-400 text-sm mb-4 line-clamp-3">
-                  {story.description}
-                </p>
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-green-400 mb-2 group-hover:text-green-300 transition-colors">
+                          {story.title}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: 10 }).map((_, i) => (
+                          <div
+                            key={i}
+                            className={`w-1 h-3 ${
+                              i < story.difficulty
+                                ? 'bg-green-400'
+                                : 'bg-green-400/20'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
 
-                {story.theme && (
-                  <div className="mb-4">
-                    <p className="text-xs text-gray-600 uppercase tracking-wider mb-1">
-                      Theme
+                    <p className="text-gray-400 text-sm mb-4 line-clamp-3">
+                      {story.description}
                     </p>
-                    <p className="text-sm text-gray-300">{story.theme}</p>
-                  </div>
-                )}
 
-                <div className="flex items-center justify-between pt-4 border-t border-green-400/10">
-                  <div className="text-xs text-gray-600">
-                    {story.nodes.length} nodes
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    by {story.author.username}
-                  </div>
-                </div>
+                    {story.theme && (
+                      <div className="mb-4">
+                        <p className="text-xs text-gray-600 uppercase tracking-wider mb-1">
+                          Theme
+                        </p>
+                        <p className="text-sm text-gray-300">{story.theme}</p>
+                      </div>
+                    )}
 
-                <div className="mt-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-sm font-bold text-green-400 tracking-wider">
-                    PLAY →
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+                    <div className="flex items-center justify-between pt-4 border-t border-green-400/10">
+                      <div className="text-xs text-gray-600">
+                        {story.nodes.length} dilemmas
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        by {story.author.username}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-sm font-bold text-green-400 tracking-wider">
+                        PLAY STORY →
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
         )}
       </div>

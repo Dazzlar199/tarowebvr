@@ -4,6 +4,7 @@
  */
 
 import OpenAI from 'openai'
+import { MODEL_CATALOG, getRelevantModels, formatCatalogForGPT } from '@/lib/model-catalog'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -17,6 +18,7 @@ export interface SceneObject {
   scale: [number, number, number]
   rotation: [number, number, number]
   color: string
+  modelPath?: string  // Optional path to OBJ model file
   emissive?: string
   emissiveIntensity?: number
   metalness?: number
@@ -45,35 +47,48 @@ export interface Scene3D {
 export async function generateSceneFromPrompt(prompt: string, category?: string, title?: string, situation?: string): Promise<Scene3D> {
   console.log('🎨 Generating scene from prompt using GPT-4 Omni...')
 
+  // Get relevant models based on the prompt
+  const relevantModels = getRelevantModels(prompt, 15)
+  const modelListText = relevantModels.map(m =>
+    `  - "${m.name}" → path: "${m.path}" (${m.tags.join(', ')})`
+  ).join('\n')
+
   // ALWAYS use GPT-4 Omni to generate scene based on prompt
   // Randomized minimalist scene is fallback if GPT-4 fails
   const systemPrompt = `You are a minimalist 3D scene designer for moral dilemmas. Create SIMPLE, CLEAN, SYMBOLIC 3D environments that represent the dilemma's theme.
 
+**AVAILABLE 3D MODELS** - You MUST use these OBJ models instead of basic shapes when appropriate:
+${modelListText}
+
 CRITICAL RULES - MUST FOLLOW:
 1. **MINIMALIST APPROACH** - Use 6-10 objects ONLY. Less is more.
 2. **SYMBOLIC REPRESENTATION** - Objects should SYMBOLIZE the dilemma, not recreate reality
-3. **CENTRAL SPACE MUST BE EMPTY** - The area around [0, 0-2, -3 to 0] must be kept CLEAR for the dilemma display panel
-4. **POSITION CONSTRAINTS - STRICTLY FOLLOW**:
+3. **USE REAL 3D MODELS** - ALWAYS use the OBJ models from the available list above when they match the theme
+   - If the dilemma is about farming, nature, or rural life → use barn, silo, windmill, fence models
+   - Include the exact "modelPath" field from the available models list
+   - You can still use basic shapes (box, sphere, etc.) for abstract elements, but PREFER real models
+4. **CENTRAL SPACE MUST BE EMPTY** - The area around [0, 0-2, -3 to 0] must be kept CLEAR for the dilemma display panel
+5. **POSITION CONSTRAINTS - STRICTLY FOLLOW**:
    - x axis: -15 to -5 (LEFT side) or 5 to 15 (RIGHT side) - AVOID CENTER (-5 to 5)
    - y axis: 0 or higher (NEVER negative - objects must be on or above ground)
    - z axis: -12 to -4 (BEHIND the central panel, visible but not blocking)
    - Keep objects SMALL and SPREAD OUT
-5. Available object types (use SPARINGLY):
+6. Available object types (use SPARINGLY):
    - Basic shapes: box, sphere, cylinder, cone, torus, plane
    - Urban: car, road, crosswalk, traffic_light, building, lamp_post, sign, bench, fence
    - Indoor: table, chair, computer, door, window, wall
    - Medical: hospital (building type)
    - Nature: tree, rock
    - Human: person
-6. Scale objects SMALL (1 unit = 1 meter):
+7. Scale objects SMALL (1 unit = 1 meter):
    - Keep objects compact: [0.5-2, 0.5-3, 0.5-2] range
    - Background elements should be distant and small
-7. Use SIMPLE, SYMBOLIC colors:
+8. Use SIMPLE, SYMBOLIC colors:
    - Choose 2-3 main colors that represent the dilemma theme
    - Use LOW metalness (0.1-0.2) and HIGH roughness (0.8-0.9)
    - Avoid overly bright or emissive materials
-8. Minimal lighting - let the main scene lights do the work
-9. Keep sky/ground/fog DARK and subtle
+9. Minimal lighting - let the main scene lights do the work
+10. Keep sky/ground/fog DARK and subtle
 
 MINIMALIST EXAMPLES (6-10 objects MAX):
 
@@ -108,20 +123,22 @@ Return ONLY valid JSON in this exact format (6-10 objects, AVOID CENTER x: -5 to
   "ambientLightColor": "#ffffff",
   "objects": [
     {
-      "type": "box",
-      "position": [-8, 0.5, -8],
+      "type": "building",
+      "modelPath": "/models/farm/Barn/Barn.obj",
+      "position": [-8, 0, -8],
       "scale": [1, 1, 1],
-      "rotation": [0, 0, 0],
-      "color": "#666666",
+      "rotation": [0, 0.5, 0],
+      "color": "#8B4513",
       "metalness": 0.1,
       "roughness": 0.9
     },
     {
-      "type": "person",
-      "position": [10, 0.85, -7],
+      "type": "fence",
+      "modelPath": "/models/farm/Fence/Fence2.obj",
+      "position": [10, 0, -7],
       "scale": [1, 1, 1],
       "rotation": [0, -0.5, 0],
-      "color": "#ffdbac",
+      "color": "#A0522D",
       "metalness": 0.1,
       "roughness": 0.9
     },
@@ -158,6 +175,7 @@ ${prompt}
 
 STRICT REQUIREMENTS:
 - 6-10 objects ONLY (NOT MORE!)
+- **USE THE AVAILABLE OBJ MODELS** from the list above - include exact "modelPath" when using them
 - Objects represent SYMBOLIC meaning of the dilemma
 - AVOID CENTER AREA: x must be < -5 or > 5, z must be < -4
 - Position objects in BACKGROUND (z: -12 to -4)
@@ -219,61 +237,90 @@ START JSON NOW:`
 /**
  * Generate a randomized minimalist scene with 6-10 objects
  * This ensures variety and prevents the same objects from appearing
+ * Now uses real OBJ models from the catalog
  */
 function generateRandomMinimalistScene(): Scene3D {
   const objectTypes: SceneObject['type'][] = [
     'box', 'sphere', 'cylinder', 'cone', 'torus',
-    'tree', 'building', 'rock', 'car', 'person',
+    'tree', 'building', 'rock', 'car',
     'bench', 'lamp_post', 'sign'
   ]
 
   const colors = [
-    '#4488ff', '#ff4444', '#44ff44', '#ffaa44', '#ff44aa',
-    '#666666', '#888888', '#aaaaaa', '#cccccc', '#555555'
+    '#8B4513', '#A0522D', '#CD853F', '#D2691E', // Browns for farm
+    '#87CEEB', '#4488ff', '#ff4444', '#44ff44', // Sky blue, primary colors
+    '#666666', '#888888', '#aaaaaa' // Grays
   ]
 
-  // Generate 6-10 random objects
+  // Generate 6-10 objects, mixing real models and basic shapes
   const objectCount = 6 + Math.floor(Math.random() * 5) // 6 to 10
   const objects: SceneObject[] = []
 
+  // Use 50% real models, 50% basic shapes
+  const useRealModels = Math.random() > 0.3 // 70% chance to use real models
+  const availableModels = MODEL_CATALOG.length > 0 ? MODEL_CATALOG : []
+
   for (let i = 0; i < objectCount; i++) {
-    // Random object type
-    const type = objectTypes[Math.floor(Math.random() * objectTypes.length)]
+    let obj: SceneObject
 
-    // Random position (AVOID CENTER, stay in BACKGROUND)
-    // x: either -15 to -5 (left) or 5 to 15 (right)
-    const xSide = Math.random() > 0.5 ? 1 : -1
-    const x = xSide * (5 + Math.random() * 10) // -15 to -5 or 5 to 15
-    const y = Math.random() * 2 // 0 to 2
-    const z = -12 + Math.random() * 8 // -12 to -4 (background)
+    // 70% chance to use a real OBJ model if available
+    if (useRealModels && availableModels.length > 0 && Math.random() > 0.3) {
+      const model = availableModels[Math.floor(Math.random() * availableModels.length)]
 
-    // Random scale (small objects)
-    const scaleBase = 0.5 + Math.random() * 1.5 // 0.5 to 2
-    const scale: [number, number, number] = [
-      scaleBase,
-      scaleBase * (0.8 + Math.random() * 0.4), // slight variation
-      scaleBase
-    ]
+      // Random position (AVOID CENTER, stay in BACKGROUND)
+      const xSide = Math.random() > 0.5 ? 1 : -1
+      const x = xSide * (5 + Math.random() * 10)
+      const y = 0 // Models sit on ground
+      const z = -12 + Math.random() * 8
 
-    // Random rotation
-    const rotation: [number, number, number] = [
-      0,
-      Math.random() * Math.PI * 2,
-      0
-    ]
+      // Use model's default scale with some variation
+      const scaleBase = model.defaultScale * (0.8 + Math.random() * 0.4)
+      const scale: [number, number, number] = [scaleBase, scaleBase, scaleBase]
 
-    // Random color
-    const color = colors[Math.floor(Math.random() * colors.length)]
+      const rotation: [number, number, number] = [0, Math.random() * Math.PI * 2, 0]
+      const color = colors[Math.floor(Math.random() * colors.length)]
 
-    objects.push({
-      type,
-      position: [x, y, z],
-      scale,
-      rotation,
-      color,
-      metalness: 0.1,
-      roughness: 0.9
-    })
+      obj = {
+        type: 'building', // Use generic type for OBJ models
+        modelPath: model.path, // Include the model path!
+        position: [x, y, z],
+        scale,
+        rotation,
+        color,
+        metalness: 0.1,
+        roughness: 0.9
+      }
+    } else {
+      // Use basic geometric shape
+      const type = objectTypes[Math.floor(Math.random() * objectTypes.length)]
+
+      const xSide = Math.random() > 0.5 ? 1 : -1
+      const x = xSide * (5 + Math.random() * 10)
+      const y = Math.random() * 2
+      const z = -12 + Math.random() * 8
+
+      const scaleBase = 0.5 + Math.random() * 1.5
+      const scale: [number, number, number] = [
+        scaleBase,
+        scaleBase * (0.8 + Math.random() * 0.4),
+        scaleBase
+      ]
+
+      const rotation: [number, number, number] = [0, Math.random() * Math.PI * 2, 0]
+      const color = colors[Math.floor(Math.random() * colors.length)]
+
+      obj = {
+        type,
+        position: [x, y, z],
+        scale,
+        rotation,
+        color,
+        metalness: 0.1,
+        roughness: 0.9
+      }
+    }
+
+    objects.push(obj)
   }
 
   // Add 1-2 random lights
