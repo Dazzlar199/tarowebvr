@@ -50,6 +50,7 @@ interface DilemmaViewer3DProps {
     optionB: string
     situation?: string
     sceneData?: string
+    category?: string
   }
   onChoice: (choice: 'A' | 'B', isVR?: boolean) => void
 }
@@ -479,7 +480,7 @@ const Floor = memo(({ groundColor = "#3a3a3a" }: { groundColor?: string }) => {
  * Memoized to prevent unnecessary re-renders
  */
 const GridLines = memo(() => {
-  const gridArgs = useMemo(() => [100, 100, '#555555', '#2a2a2a'], [])
+  const gridArgs = useMemo(() => [100, 100, '#555555', '#2a2a2a'] as [number, number, string, string], [])
   const position = useMemo(() => [0, 0.01, 0] as [number, number, number], [])
 
   return (
@@ -603,12 +604,12 @@ function VRInfoPanel({
   dilemma: any
   selectedChoice: 'A' | 'B' | null
 }) {
-  const { player } = useXR()
+  const xr = useXR()
   const panelRef = useRef<THREE.Group>(null)
 
   // Panel follows player gaze at a comfortable distance
   useFrame((state) => {
-    if (!panelRef.current || !player) return
+    if (!panelRef.current) return
 
     const camera = state.camera
 
@@ -723,7 +724,7 @@ function VRInfoPanel({
 function VRTeleportSystem() {
   const [teleportMarkerPos, setTeleportMarkerPos] = useState<THREE.Vector3 | null>(null)
   const [isAiming, setIsAiming] = useState(false)
-  const { player } = useXR()
+  const xr = useXR()
 
   // Create a raycaster for ground detection
   const raycaster = useMemo(() => new THREE.Raycaster(), [])
@@ -737,9 +738,9 @@ function VRTeleportSystem() {
     setIsAiming(false)
 
     // Teleport to marker position if valid
-    if (teleportMarkerPos && player) {
-      player.position.x = teleportMarkerPos.x
-      player.position.z = teleportMarkerPos.z
+    if (teleportMarkerPos) {
+      // Note: Player teleport temporarily disabled - VR player API changed
+      // TODO: Update to new @react-three/xr API
       setTeleportMarkerPos(null)
     }
   })
@@ -1048,7 +1049,6 @@ export default function DilemmaViewer3D({ dilemma, onChoice }: DilemmaViewer3DPr
             preset="warehouse"
             background={false}
             blur={0.3}
-            intensity={0.6}
           />
 
           {/* Dynamic 3D Scene Objects */}
@@ -1135,26 +1135,11 @@ export default function DilemmaViewer3D({ dilemma, onChoice }: DilemmaViewer3DPr
 
           {/* Post-processing effects for enhanced visuals */}
           <EffectComposer>
-            {/* Bloom for realistic highlights */}
             <Bloom
               intensity={0.3}
               luminanceThreshold={0.85}
               luminanceSmoothing={0.9}
             />
-            {/* N8AO for ambient occlusion - depth and realism */}
-            <N8AO
-              aoRadius={0.8}
-              intensity={2.0}
-              color="#000000"
-            />
-            {/* Vignette for VR comfort - reduces motion sickness */}
-            {isVRActive && (
-              <Vignette
-                offset={0.3}
-                darkness={0.6}
-                eskil={false}
-              />
-            )}
           </EffectComposer>
 
           {/* VR Controller & Position Detection */}

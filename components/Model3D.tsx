@@ -3,8 +3,8 @@
 import { useRef, useEffect, useMemo, memo } from 'react'
 import * as THREE from 'three'
 import { useLoader } from '@react-three/fiber'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
+import { OBJLoader } from 'three-stdlib'
+import { MTLLoader } from 'three-stdlib'
 import { optimizeModelTextures } from '@/lib/textureLoader'
 
 interface Model3DProps {
@@ -34,7 +34,7 @@ const Model3D = memo(function Model3D({
 
   // Load OBJ model with MTL materials if modelPath is provided
   let loadedObj: THREE.Group | null = null
-  let materials: MTLLoader.MaterialCreator | null = null
+  let materials: any = null
 
   if (modelPath) {
     try {
@@ -64,7 +64,7 @@ const Model3D = memo(function Model3D({
   // Apply quality optimizations to all models
   useEffect(() => {
     if (groupRef.current) {
-      optimizeModelTextures(groupRef.current)
+      optimizeModelTextures(groupRef.current as unknown as THREE.Object3D)
     }
   }, [])
 

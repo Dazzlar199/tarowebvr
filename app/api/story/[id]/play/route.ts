@@ -88,7 +88,7 @@ export async function GET(
         })
       }
 
-      currentNode = story.nodes.find(n => n.id === progress.currentNodeId)
+      currentNode = story.nodes.find(n => n.id === progress?.currentNodeId)
     }
 
     if (!currentNode) {
