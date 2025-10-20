@@ -40,9 +40,28 @@ export default function HomePage() {
       return;
     }
 
-    // DEFAULT mode - Navigate directly to farm dilemma
+    // DEFAULT mode - Find and navigate to farm dilemma
     if (mode === 'DEFAULT') {
-      router.push('/explore/cmgzae36r0000hbb74fb5wv25');
+      setIsGenerating(true);
+      try {
+        // Try to fetch farm dilemma
+        const response = await fetch('/api/dilemma/list?category=general&limit=1');
+        const data = await response.json();
+
+        if (data.success && data.data.dilemmas && data.data.dilemmas.length > 0) {
+          // Use the first available dilemma (farm dilemma)
+          router.push(`/explore/${data.data.dilemmas[0].id}`);
+        } else {
+          // Fallback: create a new dilemma
+          throw new Error('No default dilemma found');
+        }
+      } catch (error) {
+        console.error('Failed to load default dilemma:', error);
+        // Fallback to direct ID
+        router.push('/explore/cmgzae36r0000hbb74fb5wv25');
+      } finally {
+        setIsGenerating(false);
+      }
       return;
     }
 
