@@ -215,63 +215,16 @@ export const MODEL_CATALOG: ModelInfo[] = [
     defaultScale: 0.03
   },
 
-  // House Models (FBX) - 매우 작은 스케일
-  {
-    name: 'Single Story House',
-    path: '/models/houses/House/house_type07.fbx',
-    category: 'urban',
-    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture'],
-    defaultScale: 0.05
-  },
-  {
-    name: 'Single Story House Alt',
-    path: '/models/houses/House-7VSVwAg2T3/house_type05.fbx',
-    category: 'urban',
-    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture'],
-    defaultScale: 0.05
-  },
-  {
-    name: 'Two Story House Type 1',
-    path: '/models/houses/Two%20story%20house/house_type02.fbx',
-    category: 'urban',
-    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
-    defaultScale: 0.05
-  },
-  {
-    name: 'Two Story House Type 2',
-    path: '/models/houses/Two%20story%20house/house_type03.fbx',
-    category: 'urban',
-    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
-    defaultScale: 0.05
-  },
-  {
-    name: 'Two Story House Type 3',
-    path: '/models/houses/Two%20story%20house/house_type06.fbx',
-    category: 'urban',
-    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
-    defaultScale: 0.05
-  },
-  {
-    name: 'Two Story House Type 4',
-    path: '/models/houses/Two%20story%20house/house_type12.fbx',
-    category: 'urban',
-    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
-    defaultScale: 0.05
-  },
-  {
-    name: 'Two Story House Type 5',
-    path: '/models/houses/Two%20story%20house-htvFgnVP4d/house_type08.fbx',
-    category: 'urban',
-    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
-    defaultScale: 0.05
-  },
-  {
-    name: 'Two Story House Type 6',
-    path: '/models/houses/Two%20story%20house-QsF9E0PqyN/house_type15.fbx',
-    category: 'urban',
-    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
-    defaultScale: 0.05
-  }
+  // House Models - Temporarily disabled due to FBX loading issues
+  // These FBX files appear to be corrupted or incompatible with three-stdlib FBXLoader
+  // TODO: Re-export these models or find working versions
+  // {
+  //   name: 'Single Story House',
+  //   path: '/models/houses/House/house_type07.fbx',
+  //   category: 'urban',
+  //   tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture'],
+  //   defaultScale: 0.05
+  // },
 ]
 
 /**
