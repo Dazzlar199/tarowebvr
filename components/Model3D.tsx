@@ -2,9 +2,10 @@
 
 import { useRef, useEffect, useMemo, memo } from 'react'
 import * as THREE from 'three'
-import { useLoader } from '@react-three/fiber'
+import { useLoader, useFrame } from '@react-three/fiber'
 import { OBJLoader } from 'three-stdlib'
 import { MTLLoader } from 'three-stdlib'
+import { FBXLoader } from 'three-stdlib'
 import { optimizeModelTextures } from '@/lib/textureLoader'
 
 interface Model3DProps {
@@ -32,31 +33,40 @@ const Model3D = memo(function Model3D({
   const meshRef = useRef<THREE.Mesh>(null)
   const groupRef = useRef<THREE.Group>(null)
 
-  // Load OBJ model with MTL materials if modelPath is provided
+  // Load 3D model (OBJ or FBX) if modelPath is provided
   let loadedObj: THREE.Group | null = null
   let materials: any = null
 
   if (modelPath) {
     try {
-      // Get MTL path from OBJ path
-      const mtlPath = modelPath.replace('.obj', '.mtl')
+      const fileExtension = modelPath.toLowerCase().split('.').pop()
 
-      // Load MTL first
-      try {
-        materials = useLoader(MTLLoader, mtlPath)
-      } catch (mtlError) {
-        console.warn('MTL file not found, using default materials:', mtlPath)
-      }
+      if (fileExtension === 'fbx') {
+        // Load FBX model
+        loadedObj = useLoader(FBXLoader, modelPath)
+      } else if (fileExtension === 'obj') {
+        // Get MTL path from OBJ path
+        const mtlPath = modelPath.replace('.obj', '.mtl')
 
-      // Load OBJ with materials
-      loadedObj = useLoader(OBJLoader, modelPath, (loader) => {
-        if (materials) {
-          materials.preload()
-          loader.setMaterials(materials)
+        // Load MTL first
+        try {
+          materials = useLoader(MTLLoader, mtlPath)
+        } catch (mtlError) {
+          console.warn('MTL file not found, using default materials:', mtlPath)
         }
-      })
+
+        // Load OBJ with materials
+        loadedObj = useLoader(OBJLoader, modelPath, (loader) => {
+          if (materials) {
+            materials.preload()
+            loader.setMaterials(materials)
+          }
+        })
+      } else {
+        console.warn('Unsupported model format:', fileExtension)
+      }
     } catch (error) {
-      console.error('Failed to load OBJ model:', modelPath, error)
+      console.error('Failed to load model:', modelPath, error)
       loadedObj = null
     }
   }
@@ -92,6 +102,15 @@ const Model3D = memo(function Model3D({
       }
     }
   }, [])
+
+  // Windmill rotation animation
+  const isWindmill = modelPath && (modelPath.toLowerCase().includes('windmill'))
+  useFrame((state, delta) => {
+    if (isWindmill && groupRef.current) {
+      // Rotate windmill continuously around Y-axis
+      groupRef.current.rotation.y += delta * 0.5
+    }
+  })
 
   // If OBJ model was loaded, use it
   if (loadedObj) {

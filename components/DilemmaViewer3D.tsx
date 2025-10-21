@@ -367,8 +367,8 @@ const DilemmaHologram = memo(({ dilemma, sceneImageUrl }: {
   const textPanelGeometry = useMemo(() => [8, 4] as [number, number], [])
   const imagePanelGeometry = useMemo(() => [20, 12] as [number, number], [])
   const groupPosition = useMemo(() => [0, 0, 0] as [number, number, number], [])
-  const imagePosition = useMemo(() => [0, 12, -10] as [number, number, number], [])
-  const textPosition = useMemo(() => [0, -2, 0.1] as [number, number, number], [])
+  const imagePosition = useMemo(() => [0, 12, 0] as [number, number, number], []) // z=-10에서 z=0으로 변경
+  const textPosition = useMemo(() => [0, 1.5, 0.1] as [number, number, number], []) // y: -2 → 1.5로 상승
 
   return (
     <group position={groupPosition}>

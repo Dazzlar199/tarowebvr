@@ -4,6 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
+import toast from "react-hot-toast";
+import type { APIResponse, CreateDilemmaResponse } from "@/types/dilemma";
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -22,12 +24,14 @@ export default function HomePage() {
 
       if (data.success && data.prompt) {
         setPrompt(data.prompt);
+        toast.success("Random prompt generated!");
       } else {
         throw new Error(data.error || "Failed to generate prompt");
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       console.error("Failed to generate prompt:", error);
-      alert((t('common.error') || 'Error') + ": " + error.message);
+      toast.error(`Failed to generate prompt: ${errorMessage}`);
     } finally {
       setIsGeneratingPrompt(false);
     }
@@ -40,10 +44,14 @@ export default function HomePage() {
       return;
     }
 
-    // DEFAULT mode - Navigate to farm dilemma directly
+    // DEFAULT mode - Navigate to default dilemma
     if (mode === 'DEFAULT') {
-      // Farm dilemma ID with URL-encoded OBJ models
-      router.push('/explore/cmgzae36r0000hbb74fb5wv25');
+      const defaultDilemmaId = process.env.NEXT_PUBLIC_DEFAULT_DILEMMA_ID;
+      if (!defaultDilemmaId) {
+        toast.error('Default dilemma not configured. Please set NEXT_PUBLIC_DEFAULT_DILEMMA_ID in environment variables.');
+        return;
+      }
+      router.push(`/explore/${defaultDilemmaId}`);
       return;
     }
 
@@ -58,16 +66,18 @@ export default function HomePage() {
         }),
       });
 
-      const data = await response.json();
+      const data: APIResponse<CreateDilemmaResponse> = await response.json();
 
-      if (data.success && data.data.dilemmaId) {
+      if (data.success && data.data?.dilemmaId) {
+        toast.success("Dilemma created successfully!");
         router.push(`/explore/${data.data.dilemmaId}`);
       } else {
         throw new Error(data.error || "Failed to create dilemma");
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       console.error("Failed to generate dilemma:", error);
-      alert("Failed to create scenario: " + error.message);
+      toast.error(`Failed to create scenario: ${errorMessage}`);
     } finally {
       setIsGenerating(false);
     }
@@ -183,13 +193,19 @@ export default function HomePage() {
         </div>
       </motion.div>
 
-      {/* Multiplayer Button */}
+      {/* Navigation Buttons */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.4 }}
-        className="w-full max-w-3xl mt-8"
+        className="w-full max-w-3xl mt-8 space-y-4"
       >
+        <button
+          onClick={() => router.push('/analytics')}
+          className="w-full py-4 bg-black/60 border border-green-400/30 text-green-400 font-bold tracking-widest text-sm hover:bg-green-400/10 transition-all"
+        >
+          GLOBAL STATISTICS & PERSONALITY ANALYSIS
+        </button>
         <button
           onClick={() => router.push('/multiplayer')}
           className="w-full py-4 bg-black/60 border border-purple-400/30 text-purple-400 font-bold tracking-widest text-sm hover:bg-purple-400/10 transition-all"

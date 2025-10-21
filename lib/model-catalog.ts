@@ -78,6 +78,199 @@ export const MODEL_CATALOG: ModelInfo[] = [
     category: 'farm',
     tags: ['fence', 'boundary', 'rural', 'farm'],
     defaultScale: 1.0
+  },
+
+  // Furniture Models (FBX) - 매우 작은 스케일 (FBX 파일이 매우 큰 스케일로 export됨)
+  {
+    name: 'Double Bed',
+    path: '/models/furniture/Bed%20Double/BedDouble.fbx',
+    category: 'furniture',
+    tags: ['bed', 'furniture', 'bedroom', 'sleep', 'medical', 'hospital', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Twin Bed',
+    path: '/models/furniture/Bed%20Twin/BedTwin.fbx',
+    category: 'furniture',
+    tags: ['bed', 'furniture', 'bedroom', 'sleep', 'medical', 'hospital', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Bookcase with Books',
+    path: '/models/furniture/Bookcase%20with%20Books/Bookcase_Books.fbx',
+    category: 'furniture',
+    tags: ['bookcase', 'books', 'furniture', 'library', 'office', 'education', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Chair',
+    path: '/models/furniture/Chair/Chair.fbx',
+    category: 'furniture',
+    tags: ['chair', 'furniture', 'seating', 'office', 'dining', 'indoor'],
+    defaultScale: 0.025
+  },
+  {
+    name: 'Individual Sofa Chair',
+    path: '/models/furniture/Chair/Sofa_individual.fbx',
+    category: 'furniture',
+    tags: ['chair', 'sofa', 'furniture', 'seating', 'living room', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Closet',
+    path: '/models/furniture/Closet/Closet.fbx',
+    category: 'furniture',
+    tags: ['closet', 'wardrobe', 'furniture', 'storage', 'bedroom', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Short Closet',
+    path: '/models/furniture/Short%20Closet/ShortCloset.fbx',
+    category: 'furniture',
+    tags: ['closet', 'wardrobe', 'furniture', 'storage', 'bedroom', 'indoor'],
+    defaultScale: 0.025
+  },
+  {
+    name: 'Desk',
+    path: '/models/furniture/Desk/Desk.fbx',
+    category: 'furniture',
+    tags: ['desk', 'furniture', 'office', 'work', 'study', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Office Chair',
+    path: '/models/furniture/Office%20Chair/OfficeChair.fbx',
+    category: 'furniture',
+    tags: ['chair', 'office', 'furniture', 'seating', 'work', 'indoor'],
+    defaultScale: 0.025
+  },
+  {
+    name: 'Door Style 1',
+    path: '/models/furniture/Door/Door1.fbx',
+    category: 'furniture',
+    tags: ['door', 'entrance', 'building', 'indoor', 'architecture'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Door Style 2',
+    path: '/models/furniture/Door/Door2.fbx',
+    category: 'furniture',
+    tags: ['door', 'entrance', 'building', 'indoor', 'architecture'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Door Style 3',
+    path: '/models/furniture/Door/Door3.fbx',
+    category: 'furniture',
+    tags: ['door', 'entrance', 'building', 'indoor', 'architecture'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Night Stand',
+    path: '/models/furniture/Night%20Stand/NightStand.fbx',
+    category: 'furniture',
+    tags: ['nightstand', 'furniture', 'bedroom', 'storage', 'indoor'],
+    defaultScale: 0.02
+  },
+  {
+    name: 'Sofa',
+    path: '/models/furniture/Sofa/Sofa.fbx',
+    category: 'furniture',
+    tags: ['sofa', 'couch', 'furniture', 'seating', 'living room', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Sofa Style 2',
+    path: '/models/furniture/Sofa/Sofa2.fbx',
+    category: 'furniture',
+    tags: ['sofa', 'couch', 'furniture', 'seating', 'living room', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Sofa Style 3',
+    path: '/models/furniture/Sofa/Sofa3.fbx',
+    category: 'furniture',
+    tags: ['sofa', 'couch', 'furniture', 'seating', 'living room', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Stool',
+    path: '/models/furniture/Stool/Stool.fbx',
+    category: 'furniture',
+    tags: ['stool', 'chair', 'furniture', 'seating', 'kitchen', 'bar', 'indoor'],
+    defaultScale: 0.02
+  },
+  {
+    name: 'Table',
+    path: '/models/furniture/Table/Table.fbx',
+    category: 'furniture',
+    tags: ['table', 'furniture', 'dining', 'kitchen', 'indoor'],
+    defaultScale: 0.03
+  },
+  {
+    name: 'Table Style 2',
+    path: '/models/furniture/Table/Table2.fbx',
+    category: 'furniture',
+    tags: ['table', 'furniture', 'dining', 'kitchen', 'indoor'],
+    defaultScale: 0.03
+  },
+
+  // House Models (FBX) - 매우 작은 스케일
+  {
+    name: 'Single Story House',
+    path: '/models/houses/House/house_type07.fbx',
+    category: 'urban',
+    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture'],
+    defaultScale: 0.05
+  },
+  {
+    name: 'Single Story House Alt',
+    path: '/models/houses/House-7VSVwAg2T3/house_type05.fbx',
+    category: 'urban',
+    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture'],
+    defaultScale: 0.05
+  },
+  {
+    name: 'Two Story House Type 1',
+    path: '/models/houses/Two%20story%20house/house_type02.fbx',
+    category: 'urban',
+    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
+    defaultScale: 0.05
+  },
+  {
+    name: 'Two Story House Type 2',
+    path: '/models/houses/Two%20story%20house/house_type03.fbx',
+    category: 'urban',
+    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
+    defaultScale: 0.05
+  },
+  {
+    name: 'Two Story House Type 3',
+    path: '/models/houses/Two%20story%20house/house_type06.fbx',
+    category: 'urban',
+    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
+    defaultScale: 0.05
+  },
+  {
+    name: 'Two Story House Type 4',
+    path: '/models/houses/Two%20story%20house/house_type12.fbx',
+    category: 'urban',
+    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
+    defaultScale: 0.05
+  },
+  {
+    name: 'Two Story House Type 5',
+    path: '/models/houses/Two%20story%20house-htvFgnVP4d/house_type08.fbx',
+    category: 'urban',
+    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
+    defaultScale: 0.05
+  },
+  {
+    name: 'Two Story House Type 6',
+    path: '/models/houses/Two%20story%20house-QsF9E0PqyN/house_type15.fbx',
+    category: 'urban',
+    tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture', 'two story'],
+    defaultScale: 0.05
   }
 ]
 

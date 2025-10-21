@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface Story {
   id: string;
@@ -27,6 +28,7 @@ interface Story {
     id: string;
     username: string;
   };
+  isCompleted?: boolean; // User's completion status
 }
 
 export default function StoriesPage() {
@@ -44,7 +46,7 @@ export default function StoriesPage() {
 
   const fetchStories = async () => {
     try {
-      const response = await fetch("/api/story/create?published=true");
+      const response = await fetch("/api/story/create?published=true&userId=anonymous");
       const data = await response.json();
       if (data.success) {
         setStories(data.data.stories);
@@ -85,8 +87,8 @@ export default function StoriesPage() {
     }
   };
 
-  const handlePlayStory = (storyId: string) => {
-    router.push(`/stories/${storyId}`);
+  const handlePlayStory = (story: Story) => {
+    router.push(`/stories/${story.id}`);
   };
 
   return (
@@ -226,7 +228,7 @@ export default function StoriesPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className="panel border border-green-400/20 hover:border-green-400/50 transition-all cursor-pointer group overflow-hidden"
-                  onClick={() => handlePlayStory(story.id)}
+                  onClick={() => handlePlayStory(story)}
                 >
                   {/* Nano Banana Image - Tarot Card Style */}
                   {imageUrl && (
@@ -290,7 +292,7 @@ export default function StoriesPage() {
 
                     <div className="mt-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <span className="text-sm font-bold text-green-400 tracking-wider">
-                        PLAY STORY →
+                        {story.isCompleted ? 'REPLAY STORY →' : 'PLAY STORY →'}
                       </span>
                     </div>
                   </div>

@@ -4,6 +4,7 @@ import { successResponse, errorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+export const revalidate = 60 // 1분마다 캐시 갱신
 
 export async function GET(request: NextRequest) {
   try {

@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo } from 'react'
+import { useMemo, useRef, memo } from 'react'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { Scene3D, SceneObject } from '@/lib/ai/scene-generator'
 
@@ -9,9 +10,43 @@ interface Scene3DProps {
 }
 
 /**
+ * Animated Point Light with pulsing effect
+ */
+const AnimatedPointLight = memo(function AnimatedPointLight({
+  position,
+  color,
+  baseIntensity
+}: {
+  position: [number, number, number]
+  color: string
+  baseIntensity: number
+}) {
+  const lightRef = useRef<THREE.PointLight>(null)
+
+  // Pulsing animation using sine wave
+  useFrame((state) => {
+    if (lightRef.current) {
+      const pulse = Math.sin(state.clock.elapsedTime * 2) * 0.3 + 1 // Range: 0.7 to 1.3
+      lightRef.current.intensity = baseIntensity * pulse
+    }
+  })
+
+  return (
+    <pointLight
+      ref={lightRef}
+      position={position}
+      color={color}
+      intensity={baseIntensity}
+      distance={50}
+      decay={2}
+    />
+  )
+})
+
+/**
  * Renders a 3D scene object based on its type
  */
-function SceneObjectMesh({ obj }: { obj: SceneObject }) {
+const SceneObjectMesh = memo(function SceneObjectMesh({ obj }: { obj: SceneObject }) {
   // Special case: Tree (group of meshes)
   if (obj.type === 'tree') {
     return (
@@ -59,7 +94,7 @@ function SceneObjectMesh({ obj }: { obj: SceneObject }) {
       />
     </mesh>
   )
-}
+})
 
 /**
  * Main 3D scene component
@@ -84,13 +119,11 @@ export default function Scene3DRenderer({ sceneData }: Scene3DProps) {
         switch (light.type) {
           case 'point':
             return (
-              <pointLight
+              <AnimatedPointLight
                 key={`light-${index}`}
                 position={light.position as [number, number, number]}
                 color={light.color}
-                intensity={light.intensity}
-                distance={50}
-                decay={2}
+                baseIntensity={light.intensity}
               />
             )
           case 'directional':

@@ -213,6 +213,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const genre = searchParams.get('genre')
     const isPublished = searchParams.get('published') === 'true'
+    const userId = searchParams.get('userId') || 'anonymous'
 
     const stories = await prisma.story.findMany({
       where: {
@@ -247,9 +248,36 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     })
 
+    // Get or create user for progress check
+    let user = await prisma.user.findFirst({ where: { username: userId } })
+    if (!user) {
+      user = await prisma.user.create({
+        data: { username: userId, role: 'USER' }
+      })
+    }
+
+    // Check completion status for each story
+    const storiesWithProgress = await Promise.all(
+      stories.map(async (story) => {
+        const progress = await prisma.userStoryProgress.findUnique({
+          where: {
+            userId_storyId: {
+              userId: user.id,
+              storyId: story.id
+            }
+          }
+        })
+
+        return {
+          ...story,
+          isCompleted: progress?.isCompleted || false
+        }
+      })
+    )
+
     return successResponse({
-      stories,
-      count: stories.length,
+      stories: storiesWithProgress,
+      count: storiesWithProgress.length,
     })
 
   } catch (error: any) {
