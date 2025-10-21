@@ -44,27 +44,12 @@ export default function HomePage() {
       return;
     }
 
-    // DEFAULT mode - Try to use default dilemma, fallback to creating new one
+    // DEFAULT mode - Navigate to farm dilemma directly
     if (mode === 'DEFAULT') {
-      const defaultDilemmaId = process.env.NEXT_PUBLIC_DEFAULT_DILEMMA_ID;
-
-      if (defaultDilemmaId) {
-        // Check if dilemma exists before navigating
-        try {
-          const checkResponse = await fetch(`/api/dilemma/${defaultDilemmaId}`);
-          if (checkResponse.ok) {
-            router.push(`/explore/${defaultDilemmaId}`);
-            return;
-          }
-        } catch (error) {
-          console.log('Default dilemma not found, creating new one...');
-        }
-      }
-
-      // If no default or it doesn't exist, create a new dilemma
-      toast.loading('Creating default scenario...');
-      // Continue to create new dilemma below
-      setMode('AI'); // Temporarily switch to AI mode for creation
+      // Use hardcoded farm dilemma ID (seeded in production)
+      const defaultDilemmaId = 'cmgzae36r0000hbb74fb5wv25';
+      router.push(`/explore/${defaultDilemmaId}`);
+      return;
     }
 
     setIsGenerating(true);
