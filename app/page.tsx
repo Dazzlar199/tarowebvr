@@ -44,19 +44,8 @@ export default function HomePage() {
       return;
     }
 
-    // DEFAULT mode - Navigate to one of the default dilemmas (random)
+    // DEFAULT mode is handled by direct navigation buttons below
     if (mode === 'DEFAULT') {
-      // Two default dilemmas: farm and murder scene
-      const defaultDilemmas = [
-        'cmgzae36r0000hbb74fb5wv25',  // Farm dilemma
-        'cmh0murder001default',         // Murder crime scene dilemma
-      ];
-
-      // Pick random dilemma
-      const randomIndex = Math.floor(Math.random() * defaultDilemmas.length);
-      const defaultDilemmaId = defaultDilemmas[randomIndex];
-
-      router.push(`/explore/${defaultDilemmaId}`);
       return;
     }
 
@@ -154,6 +143,32 @@ export default function HomePage() {
             </button>
           </div>
 
+          {mode === 'DEFAULT' && (
+            <div className="mb-6">
+              <label className="block text-xs font-bold tracking-wider text-green-400 mb-3 text-center">
+                SELECT A SCENARIO
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => router.push('/explore/cmgzae36r0000hbb74fb5wv25')}
+                  className="py-8 px-6 border border-green-400/30 bg-black/60 hover:bg-green-400/10 hover:border-green-400 transition-all"
+                >
+                  <div className="text-2xl mb-2">🌾</div>
+                  <div className="font-bold tracking-wider text-sm text-green-400">농장</div>
+                  <div className="text-xs mt-1 opacity-60 text-gray-500">FARM</div>
+                </button>
+                <button
+                  onClick={() => router.push('/explore/cmh0murder001default')}
+                  className="py-8 px-6 border border-green-400/30 bg-black/60 hover:bg-green-400/10 hover:border-green-400 transition-all"
+                >
+                  <div className="text-2xl mb-2">🔪</div>
+                  <div className="font-bold tracking-wider text-sm text-green-400">밀실</div>
+                  <div className="text-xs mt-1 opacity-60 text-gray-500">CRIME SCENE</div>
+                </button>
+              </div>
+            </div>
+          )}
+
           {mode === 'AI' && (
             <div className="mb-6">
               <label className="block text-xs font-bold tracking-wider text-green-400 mb-3">
@@ -181,20 +196,22 @@ export default function HomePage() {
             </div>
           )}
 
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="w-full py-5 bg-green-400 text-black font-bold tracking-widest text-sm hover:bg-green-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isGenerating ? (
-              <span className="flex items-center justify-center">
-                <span className="divine-spinner mr-3"></span>
-                {mode === 'AI' ? t('home.ai.button.generating') : t('home.button.loading')}
-              </span>
-            ) : (
-              mode === 'AI' ? t('home.ai.button.enter') : mode === 'STORY' ? t('home.story.button') : t('home.button.enter')
-            )}
-          </button>
+          {mode !== 'DEFAULT' && (
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="w-full py-5 bg-green-400 text-black font-bold tracking-widest text-sm hover:bg-green-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isGenerating ? (
+                <span className="flex items-center justify-center">
+                  <span className="divine-spinner mr-3"></span>
+                  {mode === 'AI' ? t('home.ai.button.generating') : t('home.button.loading')}
+                </span>
+              ) : (
+                mode === 'AI' ? t('home.ai.button.enter') : mode === 'STORY' ? t('home.story.button') : t('home.button.enter')
+              )}
+            </button>
+          )}
         </div>
       </motion.div>
 
