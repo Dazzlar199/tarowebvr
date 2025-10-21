@@ -59,30 +59,42 @@ export async function generateSceneFromPrompt(prompt: string, category?: string,
   const hasFarmKeyword = farmKeywords.some(keyword => fullContext.includes(keyword))
   const hasUrbanKeyword = urbanKeywords.some(keyword => fullContext.includes(keyword))
 
-  // Get relevant models based on the prompt
-  let relevantModels = getRelevantModels(prompt, 20)
+  // FIRST: Filter by category based on context (before getting relevant models)
+  let categoryFilteredModels = MODEL_CATALOG
 
-  // Smart filtering based on context
   if (hasIndoorKeyword && !hasFarmKeyword && !hasUrbanKeyword) {
     // Pure indoor scene: only furniture
-    relevantModels = relevantModels.filter(m => m.category === 'furniture')
+    categoryFilteredModels = MODEL_CATALOG.filter(m => m.category === 'furniture')
   } else if (hasFarmKeyword) {
     // Farm scene: only farm models (no furniture, no urban)
-    relevantModels = relevantModels.filter(m => m.category === 'farm')
+    categoryFilteredModels = MODEL_CATALOG.filter(m => m.category === 'farm')
   } else if (hasUrbanKeyword) {
     // Urban scene: houses and urban models (no furniture, no farm)
-    relevantModels = relevantModels.filter(m => m.category === 'urban' || m.category === 'building')
+    categoryFilteredModels = MODEL_CATALOG.filter(m => m.category === 'urban' || m.category === 'building')
   } else {
     // Mixed/Outdoor scene: use all categories, but prefer outdoor (farm + urban)
     // Exclude furniture unless specifically mentioned
     const hasFurnitureKeyword = ['bed', 'chair', 'desk', 'sofa', 'table', '침대', '의자', '책상'].some(k => fullContext.includes(k))
     if (!hasFurnitureKeyword) {
-      relevantModels = relevantModels.filter(m => m.category !== 'furniture')
+      categoryFilteredModels = MODEL_CATALOG.filter(m => m.category !== 'furniture')
     }
   }
 
-  // Limit to 15 models
-  relevantModels = relevantModels.slice(0, 15)
+  // THEN: Get relevant models from category-filtered list
+  const relevantModels = categoryFilteredModels
+    .map(model => {
+      let score = 0
+      const keywords = prompt.toLowerCase().split(/\s+/)
+      model.tags.forEach(tag => {
+        if (keywords.some(keyword => keyword.includes(tag) || tag.includes(keyword))) {
+          score += 1
+        }
+      })
+      return { model, score }
+    })
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.model)
+    .slice(0, 15)
 
   const modelListText = relevantModels.map(m =>
     `  - "${m.name}" → path: "${m.path}" (${m.tags.join(', ')})`
