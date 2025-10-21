@@ -44,15 +44,27 @@ export default function HomePage() {
       return;
     }
 
-    // DEFAULT mode - Navigate to default dilemma
+    // DEFAULT mode - Try to use default dilemma, fallback to creating new one
     if (mode === 'DEFAULT') {
       const defaultDilemmaId = process.env.NEXT_PUBLIC_DEFAULT_DILEMMA_ID;
-      if (!defaultDilemmaId) {
-        toast.error('Default dilemma not configured. Please set NEXT_PUBLIC_DEFAULT_DILEMMA_ID in environment variables.');
-        return;
+
+      if (defaultDilemmaId) {
+        // Check if dilemma exists before navigating
+        try {
+          const checkResponse = await fetch(`/api/dilemma/${defaultDilemmaId}`);
+          if (checkResponse.ok) {
+            router.push(`/explore/${defaultDilemmaId}`);
+            return;
+          }
+        } catch (error) {
+          console.log('Default dilemma not found, creating new one...');
+        }
       }
-      router.push(`/explore/${defaultDilemmaId}`);
-      return;
+
+      // If no default or it doesn't exist, create a new dilemma
+      toast.loading('Creating default scenario...');
+      // Continue to create new dilemma below
+      setMode('AI'); // Temporarily switch to AI mode for creation
     }
 
     setIsGenerating(true);
