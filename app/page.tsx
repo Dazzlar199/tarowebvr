@@ -44,10 +44,18 @@ export default function HomePage() {
       return;
     }
 
-    // DEFAULT mode - Navigate to farm dilemma directly
+    // DEFAULT mode - Navigate to one of the default dilemmas (random)
     if (mode === 'DEFAULT') {
-      // Use hardcoded farm dilemma ID (seeded in production)
-      const defaultDilemmaId = 'cmgzae36r0000hbb74fb5wv25';
+      // Two default dilemmas: farm and murder scene
+      const defaultDilemmas = [
+        'cmgzae36r0000hbb74fb5wv25',  // Farm dilemma
+        'cmh0murder001default',         // Murder crime scene dilemma
+      ];
+
+      // Pick random dilemma
+      const randomIndex = Math.floor(Math.random() * defaultDilemmas.length);
+      const defaultDilemmaId = defaultDilemmas[randomIndex];
+
       router.push(`/explore/${defaultDilemmaId}`);
       return;
     }
