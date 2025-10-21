@@ -225,6 +225,64 @@ export const MODEL_CATALOG: ModelInfo[] = [
   //   tags: ['house', 'building', 'home', 'residential', 'suburban', 'architecture'],
   //   defaultScale: 0.05
   // },
+
+  // Room Models (GLB) - For indoor crime scenes
+  {
+    name: '3D Room',
+    path: '/models/room/roomModel.glb',
+    category: 'furniture',
+    tags: ['room', 'indoor', 'bedroom', 'crime scene', 'murder', 'interior', 'walls', 'floor'],
+    defaultScale: 1.0
+  },
+  {
+    name: 'Office Chair',
+    path: '/models/room/topChairModel.glb',
+    category: 'furniture',
+    tags: ['chair', 'office', 'furniture', 'seating', 'indoor', 'crime scene'],
+    defaultScale: 1.0
+  },
+  {
+    name: 'Mac Screen',
+    path: '/models/room/macScreenModel.glb',
+    category: 'furniture',
+    tags: ['computer', 'screen', 'mac', 'desk', 'tech', 'indoor'],
+    defaultScale: 1.0
+  },
+  {
+    name: 'PC Screen',
+    path: '/models/room/pcScreenModel.glb',
+    category: 'furniture',
+    tags: ['computer', 'screen', 'pc', 'desk', 'tech', 'indoor'],
+    defaultScale: 1.0
+  },
+  {
+    name: 'Coffee Steam',
+    path: '/models/room/coffeeSteamModel.glb',
+    category: 'furniture',
+    tags: ['coffee', 'steam', 'detail', 'indoor', 'atmosphere'],
+    defaultScale: 1.0
+  },
+  {
+    name: 'Google Home',
+    path: '/models/room/googleHomeLedsModel.glb',
+    category: 'furniture',
+    tags: ['smart home', 'device', 'tech', 'indoor'],
+    defaultScale: 1.0
+  },
+  {
+    name: 'Elgato Light',
+    path: '/models/room/elgatoLightModel.glb',
+    category: 'furniture',
+    tags: ['light', 'lamp', 'indoor', 'lighting'],
+    defaultScale: 1.0
+  },
+  {
+    name: 'Loupedeck Control',
+    path: '/models/room/loupedeckButtonsModel.glb',
+    category: 'furniture',
+    tags: ['device', 'control', 'tech', 'indoor'],
+    defaultScale: 1.0
+  }
 ]
 
 /**
