@@ -7,6 +7,7 @@ import { XR, createXRStore, useXR, useXREvent } from '@react-three/xr'
 import { EffectComposer, Bloom, SSAO, N8AO, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import Model3D from './Model3D'
+import MurderRoom from './MurderRoom'
 
 const xrStore = createXRStore()
 
@@ -276,16 +277,15 @@ const SceneObjectMesh = memo(({ obj, onDeskClick, onSofaClick }: {
 
   // Special case: Murder Room with baked textures
   if (obj.modelPath === '/models/room/roomModel.glb') {
-    console.log('🏠 Using Model3D for room with baked textures')
+    console.log('🏠 Using MurderRoom component with baked textures')
     return (
       <Suspense fallback={null}>
-        <Model3D
-          type={obj.type}
-          modelPath={obj.modelPath}
+        <MurderRoom
           position={obj.position as [number, number, number]}
           rotation={obj.rotation as [number, number, number]}
           scale={obj.scale as [number, number, number]}
-          color={obj.color}
+          onDeskClick={onDeskClick}
+          onSofaClick={onSofaClick}
         />
       </Suspense>
     )
