@@ -16,7 +16,8 @@ const dilemmaSchema = z.object({
   facts: z.array(z.string()).describe('상황의 구체적 사실들 (3-5개)'),
   optionA: z.string().describe('선택지 A의 구체적 설명 (2-3문장)'),
   optionB: z.string().describe('선택지 B의 구체적 설명 (2-3문장)'),
-  category: z.string().describe('카테고리: ai_ethics, medical, resource_allocation, privacy, environmental, war_ethics, general 중 하나'),
+  category: z.string().describe('카테고리: ai_ethics, medical, resource_allocation, privacy, environmental, war_ethics, horror, sci_fi, philosophical, general 중 하나'),
+  tags: z.array(z.string()).describe('태그 3-5개: horror, sci-fi, ethical, psychological, survival, mystery, time-pressure, moral-conflict 등'),
   immediateConsequences: z.object({
     choiceA: z.string().describe('선택 A의 즉각적 결과'),
     choiceB: z.string().describe('선택 B의 즉각적 결과'),
@@ -180,5 +181,6 @@ export function getDefaultDilemma(): DilemmaData {
       choiceB: '계약론 (구매자와의 약속 이행)',
     },
     hiddenMeaning: 'AI 시대의 도덕적 책임은 누구에게 있는가? 프로그래머, 기업, 정부, 아니면 사회 전체?',
+    tags: ['AI', 'autonomous vehicles', 'ethics', 'technology'],
   }
 }
