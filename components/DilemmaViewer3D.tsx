@@ -280,6 +280,7 @@ const SceneObjectMesh = memo(({ obj, onDeskClick, onSofaClick }: {
     return (
       <Suspense fallback={null}>
         <Model3D
+          type={obj.type}
           modelPath={obj.modelPath}
           position={obj.position as [number, number, number]}
           rotation={obj.rotation as [number, number, number]}
