@@ -16,10 +16,11 @@ const translations = {
   ko: {
     // Homepage
     'home.title': 'TAROTAROS',
+    'home.ip.subtitle': 'A GOD DOES NOT BLINK Interactive Experience',
     'home.subtitle': 'Immersive choice experience',
     'home.tagline': 'Make your choice',
-    'home.mode.default': 'DEFAULT',
-    'home.mode.default.desc': '빠른 시작',
+    'home.mode.default': 'CURATED',
+    'home.mode.default.desc': '엄선된 프리미엄',
     'home.mode.ai': 'AI POWERED',
     'home.mode.ai.desc': '커스텀 시나리오',
     'home.mode.story': 'STORY MODE',
@@ -37,6 +38,10 @@ const translations = {
     'home.ai.button.enter': '딜레마 생성 및 입장',
     'home.ai.button.generating': '딜레마 생성 중...',
     'home.story.button': '스토리 보기',
+    'home.default.murder': '밀실 딜레마',
+    'home.halloffame.subtitle': '커뮤니티가 선택한 최고의 딜레마',
+    'home.halloffame.views': '조회',
+    'home.halloffame.choices': '선택',
     'home.feature.ai.title': 'AI GENERATED',
     'home.feature.ai.desc': '무한한 시나리오',
     'home.feature.xr.title': 'IMMERSIVE XR',
@@ -87,6 +92,28 @@ const translations = {
     'multiplayer.subtitle': 'Experience dilemmas together',
     'multiplayer.button': 'MULTIPLAYER MODE',
 
+    // Archive
+    'archive.title': 'ARCHIVE',
+    'archive.subtitle': '모든 딜레마 탐색',
+    'archive.filter.all': '전체',
+    'archive.filter.ai': 'AI 생성',
+    'archive.filter.default': '기본',
+    'archive.empty': '아직 딜레마가 없습니다',
+    'archive.empty.button': '새 딜레마 만들기',
+    'archive.card.explore': '탐색',
+
+    // Profile
+    'profile.title': 'PROFILE',
+    'profile.subtitle': '당신의 선택 여정',
+    'profile.empty': '아직 선택한 딜레마가 없습니다',
+    'profile.empty.button': '첫 딜레마 시작하기',
+    'profile.stats.total': '총 선택',
+    'profile.stats.categories': '카테고리',
+    'profile.stats.analysis': '성격 분석',
+    'profile.categories.title': '카테고리 분포',
+    'profile.recent.title': '최근 선택',
+    'profile.analysis.title': '성격 분석 결과',
+
     // Common
     'common.loading': 'LOADING...',
     'common.error': 'ERROR',
@@ -94,10 +121,11 @@ const translations = {
   en: {
     // Homepage
     'home.title': 'TAROTAROS',
+    'home.ip.subtitle': 'A GOD DOES NOT BLINK Interactive Experience',
     'home.subtitle': 'Immersive choice experience',
     'home.tagline': 'Make your choice',
-    'home.mode.default': 'DEFAULT',
-    'home.mode.default.desc': 'Quick start',
+    'home.mode.default': 'CURATED',
+    'home.mode.default.desc': 'Premium Selection',
     'home.mode.ai': 'AI POWERED',
     'home.mode.ai.desc': 'Custom scenario',
     'home.mode.story': 'STORY MODE',
@@ -115,6 +143,10 @@ const translations = {
     'home.ai.button.enter': 'Generate & Enter Dilemma',
     'home.ai.button.generating': 'Generating Dilemma...',
     'home.story.button': 'View Stories',
+    'home.default.murder': 'Crime Scene',
+    'home.halloffame.subtitle': 'Community\'s Best Dilemmas',
+    'home.halloffame.views': 'views',
+    'home.halloffame.choices': 'choices',
     'home.feature.ai.title': 'AI GENERATED',
     'home.feature.ai.desc': 'Infinite scenarios',
     'home.feature.xr.title': 'IMMERSIVE XR',
@@ -164,6 +196,28 @@ const translations = {
     'multiplayer.title': 'MULTIPLAYER',
     'multiplayer.subtitle': 'Experience dilemmas together',
     'multiplayer.button': 'MULTIPLAYER MODE',
+
+    // Archive
+    'archive.title': 'ARCHIVE',
+    'archive.subtitle': 'Explore all dilemmas',
+    'archive.filter.all': 'All',
+    'archive.filter.ai': 'AI Generated',
+    'archive.filter.default': 'Default',
+    'archive.empty': 'No dilemmas available yet',
+    'archive.empty.button': 'Create New Dilemma',
+    'archive.card.explore': 'Explore',
+
+    // Profile
+    'profile.title': 'PROFILE',
+    'profile.subtitle': 'Your choice journey',
+    'profile.empty': 'No choices made yet',
+    'profile.empty.button': 'Start First Dilemma',
+    'profile.stats.total': 'Total Choices',
+    'profile.stats.categories': 'Categories',
+    'profile.stats.analysis': 'Analysis',
+    'profile.categories.title': 'Category Distribution',
+    'profile.recent.title': 'Recent Choices',
+    'profile.analysis.title': 'Personality Analysis',
 
     // Common
     'common.loading': 'LOADING...',

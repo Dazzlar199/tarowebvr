@@ -1,9 +1,11 @@
 "use client"
 
-import { useMemo, useRef, memo } from 'react'
+import { useMemo, useRef, memo, Suspense } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import type { Scene3D, SceneObject } from '@/lib/ai/scene-generator'
+import MurderRoom from './MurderRoom'
 
 interface Scene3DProps {
   sceneData: Scene3D
@@ -44,9 +46,73 @@ const AnimatedPointLight = memo(function AnimatedPointLight({
 })
 
 /**
+ * Loads and renders a GLB model
+ */
+const GLBModel = memo(function GLBModel({
+  modelPath,
+  position,
+  rotation,
+  scale
+}: {
+  modelPath: string
+  position: [number, number, number]
+  rotation: [number, number, number]
+  scale: [number, number, number]
+}) {
+  const { scene } = useGLTF(modelPath)
+
+  return (
+    <primitive
+      object={scene.clone()}
+      position={position}
+      rotation={rotation}
+      scale={scale}
+    />
+  )
+})
+
+/**
  * Renders a 3D scene object based on its type
  */
 const SceneObjectMesh = memo(function SceneObjectMesh({ obj }: { obj: SceneObject }) {
+  // Debug log
+  console.log('🎨 Rendering object:', {
+    type: obj.type,
+    modelPath: obj.modelPath,
+    position: obj.position
+  })
+
+  // Special case: Murder Room (3D room with baked textures)
+  if (obj.modelPath === '/models/room/roomModel.glb') {
+    console.log('✅ Loading MurderRoom component')
+    return (
+      <Suspense fallback={null}>
+        <MurderRoom
+          position={obj.position as [number, number, number]}
+          rotation={obj.rotation as [number, number, number]}
+          scale={obj.scale as [number, number, number]}
+        />
+      </Suspense>
+    )
+  }
+
+  // If modelPath is provided, load GLB model instead of primitive geometry
+  if (obj.modelPath) {
+    console.log('📦 Loading GLB model:', obj.modelPath)
+    return (
+      <Suspense fallback={null}>
+        <GLBModel
+          modelPath={obj.modelPath}
+          position={obj.position as [number, number, number]}
+          rotation={obj.rotation as [number, number, number]}
+          scale={obj.scale as [number, number, number]}
+        />
+      </Suspense>
+    )
+  }
+
+  console.log('⚠️ Rendering primitive geometry for type:', obj.type)
+
   // Special case: Tree (group of meshes)
   if (obj.type === 'tree') {
     return (

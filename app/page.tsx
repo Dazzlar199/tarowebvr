@@ -78,22 +78,75 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 z-0">
+        <div
+          className="absolute inset-0 animate-slow-pan"
+          style={{
+            backgroundImage: 'url(/mainshot.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'brightness(0.4)',
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
+      </div>
+
+      {/* Navigation - Top Left */}
+      <motion.nav
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
+        className="fixed top-6 left-6 z-50 flex gap-3"
+      >
+        <button
+          onClick={() => router.push('/archive')}
+          className="px-4 py-2 bg-black/80 border border-green-400/30 text-green-400 text-xs font-bold tracking-wider hover:bg-green-400/10 hover:border-green-400 transition-all backdrop-blur-sm"
+          title={t('archive.title')}
+        >
+          ARCHIVE
+        </button>
+        <button
+          onClick={() => router.push('/profile')}
+          className="px-4 py-2 bg-black/80 border border-green-400/30 text-green-400 text-xs font-bold tracking-wider hover:bg-green-400/10 hover:border-green-400 transition-all backdrop-blur-sm"
+          title={t('profile.title')}
+        >
+          PROFILE
+        </button>
+        <button
+          onClick={() => router.push('/analytics')}
+          className="px-4 py-2 bg-black/80 border border-green-400/30 text-green-400 text-xs font-bold tracking-wider hover:bg-green-400/10 hover:border-green-400 transition-all backdrop-blur-sm"
+          title="Analytics"
+        >
+          STATS
+        </button>
+        <button
+          onClick={() => router.push('/multiplayer')}
+          className="px-4 py-2 bg-black/80 border border-purple-400/30 text-purple-400 text-xs font-bold tracking-wider hover:bg-purple-400/10 hover:border-purple-400 transition-all backdrop-blur-sm"
+          title={t('multiplayer.title')}
+        >
+          MULTI
+        </button>
+      </motion.nav>
+
+      {/* Content - positioned above background */}
+      <div className="relative z-10 w-full flex flex-col items-center">
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="text-center mb-12"
+        className="text-center mb-8"
       >
         <h1 className="text-6xl md:text-8xl font-bold mb-6 mystical-text">
           {t('home.title')}
         </h1>
+        <p className="text-sm md:text-base mb-4 tracking-widest text-green-400/70 font-bold">
+          {t('home.ip.subtitle')}
+        </p>
         <p className="text-xl md:text-2xl mb-4 tracking-wide" style={{ color: 'var(--foreground)' }}>
           {t('home.subtitle')}
-        </p>
-        <p className="text-md tracking-wider" style={{ color: 'var(--text-muted)' }}>
-          {t('home.tagline')}
         </p>
       </motion.div>
 
@@ -145,26 +198,45 @@ export default function HomePage() {
 
           {mode === 'DEFAULT' && (
             <div className="mb-6">
-              <label className="block text-xs font-bold tracking-wider text-green-400 mb-3 text-center">
-                SELECT A SCENARIO
-              </label>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => router.push('/explore/cmgzae36r0000hbb74fb5wv25')}
-                  className="py-8 px-6 border border-green-400/30 bg-black/60 hover:bg-green-400/10 hover:border-green-400 transition-all"
-                >
-                  <div className="text-2xl mb-2">🌾</div>
-                  <div className="font-bold tracking-wider text-sm text-green-400">농장</div>
-                  <div className="text-xs mt-1 opacity-60 text-gray-500">FARM</div>
-                </button>
-                <button
-                  onClick={() => router.push('/explore/cmh0murder001default')}
-                  className="py-8 px-6 border border-green-400/30 bg-black/60 hover:bg-green-400/10 hover:border-green-400 transition-all"
-                >
-                  <div className="text-2xl mb-2">🔪</div>
-                  <div className="font-bold tracking-wider text-sm text-green-400">밀실</div>
-                  <div className="text-xs mt-1 opacity-60 text-gray-500">CRIME SCENE</div>
-                </button>
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-green-400 mb-2 tracking-wider">HALL OF FAME</h3>
+                <p className="text-xs text-gray-500 tracking-wide">{t('home.halloffame.subtitle')}</p>
+              </div>
+
+              {/* Featured Dilemma Card */}
+              <div
+                onClick={() => router.push('/explore/cmh0murder001default')}
+                className="group border border-green-400/30 bg-black/60 hover:bg-green-400/10 hover:border-green-400 transition-all cursor-pointer overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h4 className="font-bold tracking-wider text-lg text-green-400">{t('home.default.murder')}</h4>
+                      </div>
+                      <p className="text-xs text-gray-400 mb-3">증거인멸의 딜레마 - 당신의 형제를 보호할 것인가, 정의를 택할 것인가?</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-xs">
+                    <div className="flex items-center gap-1 text-gray-400">
+                      <span>2.5K {t('home.halloffame.views')}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-400">
+                      <span>1.8K {t('home.halloffame.choices')}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-green-400">
+                      <span>UNREAL ENHANCED</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-green-400/5 px-6 py-3 border-t border-green-400/20">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Community's Choice • Week 1</span>
+                    <span className="text-xs text-green-400 group-hover:translate-x-1 transition-transform">EXPLORE →</span>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -215,84 +287,7 @@ export default function HomePage() {
         </div>
       </motion.div>
 
-      {/* Navigation Buttons */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-        className="w-full max-w-3xl mt-8 space-y-4"
-      >
-        <button
-          onClick={() => router.push('/analytics')}
-          className="w-full py-4 bg-black/60 border border-green-400/30 text-green-400 font-bold tracking-widest text-sm hover:bg-green-400/10 transition-all"
-        >
-          GLOBAL STATISTICS & PERSONALITY ANALYSIS
-        </button>
-        <button
-          onClick={() => router.push('/multiplayer')}
-          className="w-full py-4 bg-black/60 border border-purple-400/30 text-purple-400 font-bold tracking-widest text-sm hover:bg-purple-400/10 transition-all"
-        >
-          {t('multiplayer.button')}
-        </button>
-      </motion.div>
-
-      {/* Features */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.5 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mt-20"
-      >
-        <div className="text-center p-8 bg-black/60 border border-green-400/30 backdrop-blur-sm">
-          {/* AI Neural Network Icon */}
-          <svg className="w-14 h-14 mx-auto mb-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="2" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <circle cx="6" cy="6" r="1.5" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <circle cx="18" cy="6" r="1.5" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <circle cx="6" cy="18" r="1.5" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <circle cx="18" cy="18" r="1.5" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <line x1="12" y1="10" x2="7" y2="7" stroke="#00ff41" strokeWidth="1" opacity="0.6"/>
-            <line x1="12" y1="10" x2="17" y2="7" stroke="#00ff41" strokeWidth="1" opacity="0.6"/>
-            <line x1="12" y1="14" x2="7" y2="17" stroke="#00ff41" strokeWidth="1" opacity="0.6"/>
-            <line x1="12" y1="14" x2="17" y2="17" stroke="#00ff41" strokeWidth="1" opacity="0.6"/>
-          </svg>
-          <h3 className="font-bold mb-3 text-green-400 tracking-wider text-sm">{t('home.feature.ai.title')}</h3>
-          <p className="text-xs text-gray-500 tracking-wide leading-relaxed">
-            {t('home.feature.ai.desc')}
-          </p>
-        </div>
-
-        <div className="text-center p-8 bg-black/60 border border-green-400/30 backdrop-blur-sm">
-          {/* VR Headset Icon */}
-          <svg className="w-14 h-14 mx-auto mb-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="8" width="16" height="8" rx="2" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <circle cx="8.5" cy="12" r="1.5" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <circle cx="15.5" cy="12" r="1.5" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <path d="M4 10 L2 12 L4 14" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <path d="M20 10 L22 12 L20 14" stroke="#00ff41" strokeWidth="1.5" fill="none"/>
-            <line x1="12" y1="8" x2="12" y2="6" stroke="#00ff41" strokeWidth="1.5"/>
-          </svg>
-          <h3 className="font-bold mb-3 text-green-400 tracking-wider text-sm">{t('home.feature.xr.title')}</h3>
-          <p className="text-xs text-gray-500 tracking-wide leading-relaxed">
-            {t('home.feature.xr.desc')}
-          </p>
-        </div>
-
-        <div className="text-center p-8 bg-black/60 border border-green-400/30 backdrop-blur-sm">
-          {/* Analytics Chart Icon */}
-          <svg className="w-14 h-14 mx-auto mb-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 17 L7 13 L11 16 L17 9 L21 13" stroke="#00ff41" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="7" cy="13" r="1.5" fill="#00ff41"/>
-            <circle cx="11" cy="16" r="1.5" fill="#00ff41"/>
-            <circle cx="17" cy="9" r="1.5" fill="#00ff41"/>
-            <rect x="3" y="3" width="18" height="18" rx="2" stroke="#00ff41" strokeWidth="1.5" fill="none" opacity="0.3"/>
-          </svg>
-          <h3 className="font-bold mb-3 text-green-400 tracking-wider text-sm">{t('home.feature.analysis.title')}</h3>
-          <p className="text-xs text-gray-500 tracking-wide leading-relaxed">
-            {t('home.feature.analysis.desc')}
-          </p>
-        </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

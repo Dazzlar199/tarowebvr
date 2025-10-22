@@ -469,3 +469,26 @@ body {
 .pulse-glow {
   animation: pulse-glow 2s infinite ease-in-out;
 }
+
+/* Slow panning background animation */
+@keyframes slow-pan {
+  0% {
+    transform: scale(1.1) translate(0, 0);
+  }
+  25% {
+    transform: scale(1.15) translate(-2%, -2%);
+  }
+  50% {
+    transform: scale(1.1) translate(-4%, 0);
+  }
+  75% {
+    transform: scale(1.15) translate(-2%, 2%);
+  }
+  100% {
+    transform: scale(1.1) translate(0, 0);
+  }
+}
+
+.animate-slow-pan {
+  animation: slow-pan 60s ease-in-out infinite;
+}

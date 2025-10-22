@@ -3,6 +3,7 @@
 import { useRef, useEffect, useMemo, memo } from 'react'
 import * as THREE from 'three'
 import { useLoader, useFrame } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import { OBJLoader } from 'three-stdlib'
 import { MTLLoader } from 'three-stdlib'
 import { FBXLoader } from 'three-stdlib'
@@ -33,15 +34,22 @@ const Model3D = memo(function Model3D({
   const meshRef = useRef<THREE.Mesh>(null)
   const groupRef = useRef<THREE.Group>(null)
 
-  // Load 3D model (OBJ or FBX) if modelPath is provided
+  // Load 3D model (GLB, OBJ, or FBX) if modelPath is provided
   let loadedObj: THREE.Group | null = null
   let materials: any = null
+  let gltfScene: THREE.Group | null = null
 
   if (modelPath) {
-    try {
-      const fileExtension = modelPath.toLowerCase().split('.').pop()
+    const fileExtension = modelPath.toLowerCase().split('.').pop()
+    console.log('🔧 Model3D loading:', modelPath, 'extension:', fileExtension)
 
-      if (fileExtension === 'fbx') {
+    try {
+      if (fileExtension === 'glb' || fileExtension === 'gltf') {
+        // Load GLB/GLTF model using useGLTF hook
+        const { scene } = useGLTF(modelPath)
+        gltfScene = scene
+        console.log('✅ GLB loaded, scene children:', scene.children.length)
+      } else if (fileExtension === 'fbx') {
         // Load FBX model
         loadedObj = useLoader(FBXLoader, modelPath)
       } else if (fileExtension === 'obj') {
@@ -68,6 +76,7 @@ const Model3D = memo(function Model3D({
     } catch (error) {
       console.error('Failed to load model:', modelPath, error)
       loadedObj = null
+      gltfScene = null
     }
   }
 
@@ -112,7 +121,36 @@ const Model3D = memo(function Model3D({
     }
   })
 
-  // If OBJ model was loaded, use it
+  // If GLB/GLTF model was loaded, use it
+  if (gltfScene) {
+    console.log('📦 Rendering GLB scene')
+    // Clone the loaded scene to avoid modifying the original
+    const clonedScene = useMemo(() => gltfScene.clone(), [gltfScene])
+
+    // Apply shadows to all meshes
+    useEffect(() => {
+      if (clonedScene) {
+        clonedScene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.castShadow = true
+            child.receiveShadow = true
+          }
+        })
+      }
+    }, [clonedScene])
+
+    return (
+      <primitive
+        ref={groupRef}
+        object={clonedScene}
+        position={position}
+        rotation={rotation}
+        scale={scale}
+      />
+    )
+  }
+
+  // If OBJ/FBX model was loaded, use it
   if (loadedObj) {
     // Clone the loaded object to avoid modifying the original
     const clonedObj = useMemo(() => loadedObj.clone(), [loadedObj])

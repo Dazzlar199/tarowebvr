@@ -7,6 +7,7 @@ import { XR, createXRStore, useXR, useXREvent } from '@react-three/xr'
 import { EffectComposer, Bloom, SSAO, N8AO, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import Model3D from './Model3D'
+import MurderRoom from './MurderRoom'
 
 const xrStore = createXRStore()
 
@@ -267,8 +268,45 @@ const Portal = memo(PortalInner)
  * Dynamic 3D Scene Object - Using Model3D Component
  * Memoized to prevent unnecessary re-renders
  */
-const SceneObjectMesh = memo(({ obj }: { obj: SceneObject }) => {
-  // Memoize geometry selection
+const SceneObjectMesh = memo(({ obj, onDeskClick, onSofaClick }: {
+  obj: SceneObject
+  onDeskClick?: () => void
+  onSofaClick?: () => void
+}) => {
+  console.log('🎨 Rendering SceneObject:', { type: obj.type, modelPath: obj.modelPath })
+
+  // Special case: Murder Room with baked textures
+  if (obj.modelPath === '/models/room/roomModel.glb') {
+    console.log('🏠 Using MurderRoom component with baked textures')
+    return (
+      <Suspense fallback={null}>
+        <MurderRoom
+          position={obj.position as [number, number, number]}
+          rotation={obj.rotation as [number, number, number]}
+          scale={obj.scale as [number, number, number]}
+          onDeskClick={onDeskClick}
+          onSofaClick={onSofaClick}
+        />
+      </Suspense>
+    )
+  }
+
+  // If modelPath is provided, use Model3D
+  if (obj.modelPath) {
+    console.log('📦 Using Model3D for:', obj.modelPath)
+    return (
+      <Model3D
+        type={obj.type}
+        modelPath={obj.modelPath}
+        position={obj.position}
+        rotation={obj.rotation}
+        scale={obj.scale}
+        color={obj.color}
+      />
+    )
+  }
+
+  // Memoize geometry selection for primitives
   const geometry = useMemo(() => {
     switch (obj.type) {
       case 'box':
@@ -366,7 +404,7 @@ const DilemmaHologram = memo(({ dilemma, sceneImageUrl }: {
 }) => {
   const textPanelGeometry = useMemo(() => [8, 4] as [number, number], [])
   const imagePanelGeometry = useMemo(() => [20, 12] as [number, number], [])
-  const groupPosition = useMemo(() => [0, 0, 0] as [number, number, number], [])
+  const groupPosition = useMemo(() => [0, 0, -15] as [number, number, number], []) // Move hologram to negative z
   const imagePosition = useMemo(() => [0, 12, 0] as [number, number, number], []) // z=-10에서 z=0으로 변경
   const textPosition = useMemo(() => [0, 1.5, 0.1] as [number, number, number], []) // y: -2 → 1.5로 상승
 
@@ -919,10 +957,17 @@ export default function DilemmaViewer3D({ dilemma, onChoice }: DilemmaViewer3DPr
     }
   }, [])
 
+  // Different camera settings for murder room
+  const isMurderRoom = dilemma.id === 'cmh0murder001default'
+  console.log('🔍 Dilemma ID:', dilemma.id, 'isMurderRoom:', isMurderRoom)
+  const cameraPosition = isMurderRoom ? [0, 2.5, -50] : [0, 3, 15] // Behind portals at z:-20, looking toward room at z:0
+  const cameraFov = isMurderRoom ? 90 : 60 // Much wider FOV for interior
+  console.log('📷 Camera position:', cameraPosition, 'FOV:', cameraFov)
+
   return (
     <div className="w-full h-screen relative">
       <Canvas
-        camera={{ position: [0, 3, 15], fov: 60 }}
+        camera={{ position: cameraPosition as [number, number, number], fov: cameraFov }}
         shadows
         dpr={[1, 2]}
         performance={{ min: 0.8 }}
@@ -939,7 +984,7 @@ export default function DilemmaViewer3D({ dilemma, onChoice }: DilemmaViewer3DPr
           gl.toneMappingExposure = 0.5
           gl.shadowMap.enabled = true
           gl.shadowMap.type = THREE.PCFSoftShadowMap
-          scene.background = new THREE.Color('#87CEEB')  // 하늘색
+          scene.background = new THREE.Color(scene3D?.skyColor || '#87CEEB')
         }}
       >
         <XR store={xrStore}>
@@ -1041,8 +1086,10 @@ export default function DilemmaViewer3D({ dilemma, onChoice }: DilemmaViewer3DPr
             target-position={[0, 6, -6]}
           />
 
-          {/* Scene fog - atmospheric depth */}
-          <fog attach="fog" args={[scene3D?.fogColor || '#2a2a2a', 40, 80]} />
+          {/* Scene fog - atmospheric depth (only if fogDensity > 0) */}
+          {scene3D?.fogDensity && scene3D.fogDensity > 0 && (
+            <fog attach="fog" args={[scene3D?.fogColor || '#2a2a2a', 40, 80]} />
+          )}
 
           {/* Environment map for realistic reflections */}
           <Environment
@@ -1053,7 +1100,12 @@ export default function DilemmaViewer3D({ dilemma, onChoice }: DilemmaViewer3DPr
 
           {/* Dynamic 3D Scene Objects */}
           {scene3D?.objects.map((obj, index) => (
-            <SceneObjectMesh key={index} obj={obj} />
+            <SceneObjectMesh
+              key={index}
+              obj={obj}
+              onDeskClick={() => handlePortalClick('A')}
+              onSofaClick={() => handlePortalClick('B')}
+            />
           ))}
 
           {/* Dynamic Lights */}
@@ -1065,69 +1117,107 @@ export default function DilemmaViewer3D({ dilemma, onChoice }: DilemmaViewer3DPr
                   position={light.position}
                   color={light.color}
                   intensity={light.intensity}
+                  distance={50}
+                  decay={2}
+                />
+              )
+            }
+            if (light.type === 'directional') {
+              return (
+                <directionalLight
+                  key={`light-${index}`}
+                  position={light.position}
+                  color={light.color}
+                  intensity={light.intensity}
+                />
+              )
+            }
+            if (light.type === 'spot') {
+              return (
+                <spotLight
+                  key={`light-${index}`}
+                  position={light.position}
+                  color={light.color}
+                  intensity={light.intensity}
+                  angle={Math.PI / 6}
+                  penumbra={0.5}
                 />
               )
             }
             return null
           })}
 
-          {/* Floor and grid */}
-          <Floor groundColor={scene3D?.groundColor} />
-          <GridLines />
+          {/* Floor and grid - hide for murder room */}
+          {dilemma.id !== 'cmh0murder001default' && (
+            <>
+              <Floor groundColor={scene3D?.groundColor} />
+              <GridLines />
+            </>
+          )}
 
-          {/* Left Choice Zone (Path A) */}
-          <group
-            onClick={() => handlePortalClick('A')}
-            onPointerOver={(e) => { if (!isVRActive) document.body.style.cursor = 'pointer' }}
-            onPointerOut={(e) => { if (!isVRActive) document.body.style.cursor = 'default' }}
-          >
-            <Portal
-              ref={portalARef}
-              position={[-10, 0, 0]}
-              color="#4488ff"
-              label="선택 A"
-              emissiveIntensity={selectedChoice === 'A' ? 1.2 : 0.6}
-              hovered={hoveredPortal === 'A'}
-              selected={selectedChoice === 'A'}
-            />
-          </group>
+          {/* Portals - hide in murder room mode (use clickable objects instead) */}
+          {!isMurderRoom && (
+            <>
+              {/* Left Choice Zone (Path A) - adjusted position */}
+              <group
+                onClick={() => handlePortalClick('A')}
+                onPointerOver={(e) => { if (!isVRActive) document.body.style.cursor = 'pointer' }}
+                onPointerOut={(e) => { if (!isVRActive) document.body.style.cursor = 'default' }}
+              >
+                <Portal
+                  ref={portalARef}
+                  position={[-8, 0, -20]}
+                  color="#4488ff"
+                  label="선택 A"
+                  emissiveIntensity={selectedChoice === 'A' ? 1.2 : 0.6}
+                  hovered={hoveredPortal === 'A'}
+                  selected={selectedChoice === 'A'}
+                />
+              </group>
 
-          {/* Right Choice Zone (Path B) */}
-          <group
-            onClick={() => handlePortalClick('B')}
-            onPointerOver={(e) => { if (!isVRActive) document.body.style.cursor = 'pointer' }}
-            onPointerOut={(e) => { if (!isVRActive) document.body.style.cursor = 'default' }}
-          >
-            <Portal
-              ref={portalBRef}
-              position={[10, 0, 0]}
-              color="#ff4444"
-              label="선택 B"
-              emissiveIntensity={selectedChoice === 'B' ? 1.2 : 0.6}
-              hovered={hoveredPortal === 'B'}
-              selected={selectedChoice === 'B'}
-            />
-          </group>
+              {/* Right Choice Zone (Path B) - adjusted position */}
+              <group
+                onClick={() => handlePortalClick('B')}
+                onPointerOver={(e) => { if (!isVRActive) document.body.style.cursor = 'pointer' }}
+                onPointerOut={(e) => { if (!isVRActive) document.body.style.cursor = 'default' }}
+              >
+                <Portal
+                  ref={portalBRef}
+                  position={[8, 0, -20]}
+                  color="#ff4444"
+                  label="선택 B"
+                  emissiveIntensity={selectedChoice === 'B' ? 1.2 : 0.6}
+                  hovered={hoveredPortal === 'B'}
+                  selected={selectedChoice === 'B'}
+                />
+              </group>
+            </>
+          )}
 
-          {/* Central hologram */}
-          <Suspense fallback={null}>
-            <DilemmaHologram dilemma={dilemma} sceneImageUrl={sceneImageUrl} />
-          </Suspense>
+          {/* Central hologram - hide in murder room, show light instead */}
+          {!isMurderRoom ? (
+            <Suspense fallback={null}>
+              <DilemmaHologram dilemma={dilemma} sceneImageUrl={sceneImageUrl} />
+            </Suspense>
+          ) : (
+            // Spotlight in murder room instead of hologram
+            <pointLight position={[0, 3, -15]} color="#ffffff" intensity={2} distance={30} decay={2} />
+          )}
 
           {/* Camera controls */}
           <OrbitControls
             enableZoom={true}
-            enablePan={true}
+            enablePan={!isMurderRoom} // Disable pan in murder room for immersion
             enableDamping={true}
             dampingFactor={0.05}
             rotateSpeed={0.5}
+            target={isMurderRoom ? [0, 2.5, 0] : [0, 1, 0]} // Look toward room center at z:0
             zoomSpeed={0.8}
             panSpeed={0.5}
-            minDistance={8}
-            maxDistance={30}
-            minPolarAngle={Math.PI / 6}
-            maxPolarAngle={Math.PI / 2.2}
-            target={[0, 1, 0]}
+            minDistance={isMurderRoom ? 10 : 8} // Keep some distance from room
+            maxDistance={isMurderRoom ? 80 : 30} // Allow pulling back far
+            minPolarAngle={isMurderRoom ? 0 : Math.PI / 6} // Free look in room
+            maxPolarAngle={isMurderRoom ? Math.PI : Math.PI / 2.2}
           />
 
           {/* Environment lighting - clean preset */}
@@ -1189,29 +1279,29 @@ export default function DilemmaViewer3D({ dilemma, onChoice }: DilemmaViewer3DPr
 
       {/* Option Details - CLICKABLE */}
       <div className="absolute bottom-3 left-3 right-3 flex gap-2 justify-between">
-        {/* Path A info - CLICKABLE */}
+        {/* Path A info - CLICKABLE (BLUE) */}
         <div
           onClick={() => handlePortalClick('A')}
-          className={`bg-black/80 backdrop-blur-sm p-3 border-2 flex-1 max-w-[48%] cursor-pointer transition-all duration-300 hover:bg-gray-700/30 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-300/50 ${
+          className={`bg-black/80 backdrop-blur-sm p-3 border-2 flex-1 max-w-[48%] cursor-pointer transition-all duration-300 ${
             selectedChoice === 'A'
-              ? 'border-gray-300 shadow-lg shadow-gray-300/50'
-              : 'border-gray-500/50'
+              ? 'border-blue-400 shadow-lg shadow-blue-400/50 bg-blue-500/10'
+              : 'border-blue-500/50 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-400/30'
           }`}
         >
-          <h3 className="font-bold text-gray-200 mb-2 text-sm tracking-wider">PATH A</h3>
+          <h3 className="font-bold text-blue-300 mb-2 text-sm tracking-wider">PATH A</h3>
           <p className="text-xs text-gray-300 leading-relaxed">{dilemma.optionA}</p>
         </div>
 
-        {/* Path B info - CLICKABLE */}
+        {/* Path B info - CLICKABLE (RED) */}
         <div
           onClick={() => handlePortalClick('B')}
-          className={`bg-black/80 backdrop-blur-sm p-3 border-2 flex-1 max-w-[48%] cursor-pointer transition-all duration-300 hover:bg-gray-700/30 hover:border-gray-400 hover:shadow-lg hover:shadow-gray-400/50 ${
+          className={`bg-black/80 backdrop-blur-sm p-3 border-2 flex-1 max-w-[48%] cursor-pointer transition-all duration-300 ${
             selectedChoice === 'B'
-              ? 'border-gray-400 shadow-lg shadow-gray-400/50'
-              : 'border-gray-600/50'
+              ? 'border-red-400 shadow-lg shadow-red-400/50 bg-red-500/10'
+              : 'border-red-500/50 hover:border-red-400 hover:shadow-lg hover:shadow-red-400/30'
           }`}
         >
-          <h3 className="font-bold text-gray-300 mb-2 text-sm tracking-wider">PATH B</h3>
+          <h3 className="font-bold text-red-300 mb-2 text-sm tracking-wider">PATH B</h3>
           <p className="text-xs text-gray-300 leading-relaxed">{dilemma.optionB}</p>
         </div>
       </div>
