@@ -7,7 +7,6 @@ import { XR, createXRStore, useXR, useXREvent } from '@react-three/xr'
 import { EffectComposer, Bloom, SSAO, N8AO, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import Model3D from './Model3D'
-import MurderRoom from './MurderRoom'
 
 const xrStore = createXRStore()
 
