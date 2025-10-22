@@ -285,8 +285,6 @@ const SceneObjectMesh = memo(({ obj, onDeskClick, onSofaClick }: {
           rotation={obj.rotation as [number, number, number]}
           scale={obj.scale as [number, number, number]}
           color={obj.color}
-          metalness={obj.metalness}
-          roughness={obj.roughness}
         />
       </Suspense>
     )
