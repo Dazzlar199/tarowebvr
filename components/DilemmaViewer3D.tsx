@@ -276,15 +276,17 @@ const SceneObjectMesh = memo(({ obj, onDeskClick, onSofaClick }: {
 
   // Special case: Murder Room with baked textures
   if (obj.modelPath === '/models/room/roomModel.glb') {
-    console.log('🏠 Using MurderRoom component with baked textures')
+    console.log('🏠 Using Model3D for room with baked textures')
     return (
       <Suspense fallback={null}>
-        <MurderRoom
+        <Model3D
+          modelPath={obj.modelPath}
           position={obj.position as [number, number, number]}
           rotation={obj.rotation as [number, number, number]}
           scale={obj.scale as [number, number, number]}
-          onDeskClick={onDeskClick}
-          onSofaClick={onSofaClick}
+          color={obj.color}
+          metalness={obj.metalness}
+          roughness={obj.roughness}
         />
       </Suspense>
     )
