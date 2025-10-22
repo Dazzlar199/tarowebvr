@@ -233,7 +233,7 @@ export default function HomePage() {
 
                 <div className="bg-green-400/5 px-6 py-3 border-t border-green-400/20">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Community's Choice • Week 1</span>
+                    <span className="text-xs text-gray-500">Community&apos;s Choice • Week 1</span>
                     <span className="text-xs text-green-400 group-hover:translate-x-1 transition-transform">EXPLORE →</span>
                   </div>
                 </div>
